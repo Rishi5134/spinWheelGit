@@ -1,0 +1,4 @@
+
+# This file stores configurations for your Shopify app.
+
+scopes = "write_products,write_customers,write_price_rules,write_discounts,read_price_rules,read_discounts,write_orders"
