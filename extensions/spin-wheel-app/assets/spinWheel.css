@@ -91,11 +91,14 @@ text{
     /* background-color: rgba(0, 255, 255, 0); */
     background-image: none;
     /* border-radius: 100%; */
+    /* z-index: 9999; */
+    z-index: 9;
 
 }
+
 .banner--large:not(.banner--adapt) {
     min-height: 72rem;
-    z-index: -1;
+    /* z-index: -1; */
 }
 #spin_block{
     background-color: rgba(0, 255, 255, 0.48);
@@ -107,6 +110,7 @@ text{
     width: max-content;
     float: right !important;
     bottom: 0 !important;
+ 
 }
 .offerDisp{
     display: flex;

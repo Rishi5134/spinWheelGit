@@ -1,10 +1,14 @@
+$(document).ready(function () {
+    checkCookie();
+    console.log("cookie generated!");
+});
 
-    var script2 = document.createElement('link');
-    script2.rel = 'stylesheet';
-    script2.href = 'https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css';
-    document.getElementsByTagName('head')[0].appendChild(script2);
-    
-    console.log("Script Added", script2);
+var script2 = document.createElement('link');
+script2.rel = 'stylesheet';
+script2.href = 'https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css';
+document.getElementsByTagName('head')[0].appendChild(script2);
+
+console.log("Script Added", script2);
 
 var padding;
 var container;
@@ -13,7 +17,7 @@ var LaptopLWidth = window.matchMedia("(min-width: 901px)").matches && window.mat
 var TabletWidth = window.matchMedia("(min-width: 500px)").matches && window.matchMedia("(max-width: 900px)").matches
 var MobileWidth = window.matchMedia("(max-width: 499px)").matches
 
- 
+
 function responsivePadding(w0, h0, r1_0, r2_0) {
     padding = { top: 20, right: 40, bottom: 0, left: 0 },
         w = w0 - padding.left - padding.right, //420 
@@ -94,14 +98,14 @@ if (matchMedia("(max-width: 240px)").matches) {
 //             oldpick = [],
 //             color = d3.scale.category20();
 var data = [
-    { "label": "RS 20", "value": 0, "offerText": "RS 20 OFF", "offerCode":"EU00FN" },
-    { "label": "RS 10", "value": 40, "offerText": "RS 40 OFF", "offerCode":"GR40QE" },
-    { "label": "RS 5", "value": 5, "offerText": "RS 50 OFF" ,"offerCode":"OP50RE" },
-    { "label": "RS 30", "value": 30, "offerText": "RS 30 OFF", "offerCode":"YJ30BR" },
-    { "label": "RS 50", "value": 50, "offerText": "RS 50 OFF", "offerCode":"OP50RE" },
-    { "label": "RS 1", "value": 10, "offerText": "RS 1 OFF", "offerCode":"AE60MO" },
-    { "label": "RS 0", "value": 0, "offerText": "RS 0 OFF", "offerCode":"EU00FN" },
-    { "label": "RS 10", "value": 10, "offerText": "RS 60 OFF", "offerCode":"AE60MO" },
+    { "label": "RS 20", "value": 0, "offerText": "RS 20 OFF", "offerCode": "EU00FN" },
+    { "label": "RS 10", "value": 40, "offerText": "RS 40 OFF", "offerCode": "GR40QE" },
+    { "label": "RS 5", "value": 5, "offerText": "RS 50 OFF", "offerCode": "OP50RE" },
+    { "label": "RS 30", "value": 30, "offerText": "RS 30 OFF", "offerCode": "YJ30BR" },
+    { "label": "RS 50", "value": 50, "offerText": "RS 50 OFF", "offerCode": "OP50RE" },
+    { "label": "RS 1", "value": 10, "offerText": "RS 1 OFF", "offerCode": "AE60MO" },
+    { "label": "RS 0", "value": 0, "offerText": "RS 0 OFF", "offerCode": "EU00FN" },
+    { "label": "RS 10", "value": 10, "offerText": "RS 60 OFF", "offerCode": "AE60MO" },
 ];
 if (MobileWidth) {
     var svg = d3.select('#chart')
@@ -183,74 +187,74 @@ function spin(d) {
     // email validation
 
     console.log("werwer");
-var x=document.myform.email.value;  
-var atposition=x.indexOf("@");  
-var dotposition=x.lastIndexOf(".");  
-if (atposition<1 || dotposition<atposition+2 || dotposition+2>=x.length){  
-  alert("Please enter a valid e-mail address \n atpostion:"+atposition+"\n dotposition:"+dotposition);  
-  return false;  
-  } else{
+    var x = document.myform.email.value;
+    var atposition = x.indexOf("@");
+    var dotposition = x.lastIndexOf(".");
+    if (atposition < 1 || dotposition < atposition + 2 || dotposition + 2 >= x.length) {
+        alert("Please enter a valid e-mail address \n atpostion:" + atposition + "\n dotposition:" + dotposition);
+        return false;
+    } else {
 
-//  Spin Animation in action
-    try {
+        //  Spin Animation in action
+        try {
 
-        if (document.getElementById('spinner-email').value == '') {
-            return alert("Enter Email to spin");
-        }
-        d.preventDefault();
-        container.on("click", null);
-        //all slices have been seen, all done
-        console.log("OldPick: " + oldpick.length, "Data length: " + data.length);
-        if (oldpick.length == data.length) {
-            console.log("done");
+            if (document.getElementById('spinner-email').value == '') {
+                return alert("Enter Email to spin");
+            }
+            d.preventDefault();
             container.on("click", null);
-            return;
+            //all slices have been seen, all done
+            console.log("OldPick: " + oldpick.length, "Data length: " + data.length);
+            if (oldpick.length == data.length) {
+                console.log("done");
+                container.on("click", null);
+                return;
+            }
+            if (oldpick.length > 0) {
+                console.log("done");
+                container.on("click", null);
+                alert('Spin completed!!')
+                return;
+            }
+            var ps = 360 / data.length,
+                pieslice = Math.round(1440 / data.length),
+                rng = Math.floor((Math.random() * 1440) + 360);
+
+            rotation = (Math.round(rng / ps) * ps);
+
+            picked = Math.round(data.length - (rotation % 360) / ps);
+            picked = picked >= data.length ? (picked % data.length) : picked;
+            if (oldpick.indexOf(picked) !== -1) {
+                d3.select(this).call(spin);
+                return;
+            } else {
+                oldpick.push(picked);
+            }
+            rotation += 90 - Math.round(ps / 2);
+            vis.transition()
+                .duration(3000)
+                .attrTween("transform", rotTween)
+                .each("end", function () {
+                    //mark offerText as seen
+                    d3.select(".slice:nth-child(" + (picked + 1) + ") path")
+                        .attr("fill", "transparent");
+                    //populate offerText
+                    d3.select("#offerText h1")
+                        .text(data[picked].offerText);
+                    d3.select("#spinnerCode")
+                        .attr('value', data[picked].offerCode);
+                    oldrotation = rotation;
+
+                    /* Get the result value from object "data" */
+                    console.log(data[picked].value)
+
+                    /* Comment the below line for restrict spin to sngle time */
+                    container.on("click", spin);
+                });
+        } catch (error) {
+            console.log(error);
         }
-        if (oldpick.length > 0) {
-            console.log("done");
-            container.on("click", null);
-            alert('Spin completed!!')
-            return;
-        }
-        var ps = 360 / data.length,
-            pieslice = Math.round(1440 / data.length),
-            rng = Math.floor((Math.random() * 1440) + 360);
-
-        rotation = (Math.round(rng / ps) * ps);
-
-        picked = Math.round(data.length - (rotation % 360) / ps);
-        picked = picked >= data.length ? (picked % data.length) : picked;
-        if (oldpick.indexOf(picked) !== -1) {
-            d3.select(this).call(spin);
-            return;
-        } else {
-            oldpick.push(picked);
-        }
-        rotation += 90 - Math.round(ps / 2);
-        vis.transition()
-            .duration(3000)
-            .attrTween("transform", rotTween)
-            .each("end", function () {
-                //mark offerText as seen
-                d3.select(".slice:nth-child(" + (picked + 1) + ") path")
-                    .attr("fill", "transparent");
-                //populate offerText
-                d3.select("#offerText h1")
-                    .text(data[picked].offerText);
-                d3.select("#spinnerCode")
-                    .attr('value', data[picked].offerCode);
-                oldrotation = rotation;
-
-                /* Get the result value from object "data" */
-                console.log(data[picked].value)
-
-                /* Comment the below line for restrict spin to sngle time */
-                container.on("click", spin);
-            });
-    } catch (error) {
-        console.log(error);
     }
-}
 
 }
 //make arrow
@@ -351,11 +355,24 @@ document.getElementById('spinnerImage').onclick = function () {
     console.log("image clicked");
     if (document.getElementById('spin_block').style.display == "none") {
         document.getElementById('spin_block').style.display = "flex";
+
+        document.getElementById('mainSpinnner').style.zIndex = "999999";
+        // document.getElementById('spinnWheel').style.zIndex = "999999";
+        // document.getElementById('spinnWheel').style.zIndex = "999999999";
         //    document.getElementById('spin_block').style.flexDirection = "column";
         //    document.getElementById('spin_block').style.justifyContent = "center";
         //    document.getElementById('spin_block').style.alignItems = "center";
+        document.getElementById('mainSpinnner').style.width = "100vw";
+        document.getElementById('mainSpinnner').style.height = "100%";
+        // document.getElementById('MainContent').style.zIndex = "-1"
         console.log('opened')
     } else {
+        // document.getElementById('spin_block').style.zIndex = "-1";
+        document.getElementById('mainSpinnner').style.width = "0rem";
+        document.getElementById('mainSpinnner').style.height = "0rem";
+
+        document.getElementById('mainSpinnner').style.zIndex = "-1"
+        // document.getElementById('spinnWheel').style.zIndex = "0"
 
         document.getElementById('spin_block').style.display = "none";
         console.log('closed')
@@ -369,7 +386,6 @@ if (mediaQuery.matches) {
     document.getElementById('spin_block').style.alignItems = "center";
 
 }
-
 
 
 
@@ -395,26 +411,66 @@ if (KWidth.matches) {
     document.getElementsByClassName('spinText').style.fontSize = "4rem";
 } else {
     document.getElementsByClassName('spinText').style.fontSize = "2rem";
-    
+
 }
 
 
 
-function validateemail()  {  
+function validateemail() {
     console.log("werwer");
-var x=document.myform.email.value;  
-var atposition=x.indexOf("@");  
-var dotposition=x.lastIndexOf(".");  
-if (atposition<1 || dotposition<atposition+2 || dotposition+2>=x.length){  
-  alert("Please enter a valid e-mail address \n atpostion:"+atposition+"\n dotposition:"+dotposition);  
-  return false;  
-  } 
-} 
-
-/* Copy text into clipboard */
-function copyText() {
-      
-    navigator.clipboard.writeText
-        (document.getElementById('spinnerCode').value);
-        alert('Copied!!')
+    var x = document.myform.email.value;
+    var atposition = x.indexOf("@");
+    var dotposition = x.lastIndexOf(".");
+    if (atposition < 1 || dotposition < atposition + 2 || dotposition + 2 >= x.length) {
+        alert("Please enter a valid e-mail address \n atpostion:" + atposition + "\n dotposition:" + dotposition);
+        return false;
+    }
 }
+
+function spinwheelCookieGenerator(length) {
+    var result = '';
+    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for (var i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() *
+            charactersLength));
+    }
+    console.log("Value:", result);
+    return result;
+}
+
+function setCookie(cname, cvalue, exdays) {
+    const d = new Date();
+    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+    let expires = "expires=" + d.toUTCString();
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+    console.log("exdays", exdays)
+}
+
+function getCookie(cname) {
+    let name = cname + "=";
+    let decodedCookie = decodeURIComponent(document.cookie);
+    let ca = decodedCookie.split(';');
+    for (let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
+
+function checkCookie() {
+    let spinCookie = getCookie("spinwheel-cookie");
+    if (spinCookie != "") {
+        alert("Welcome again " + spinCookie);
+    } else {
+        setCookie("spinwheel-cookie", spinwheelCookieGenerator(15), 1);
+        console.log("spinwheel-cookie generated " + spinCookie);
+    }
+}
+
+

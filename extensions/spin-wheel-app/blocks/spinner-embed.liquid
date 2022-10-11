@@ -1,6 +1,6 @@
 {{ 'spinWheel.css' | asset_url | stylesheet_tag }}
 
-<div style="position: fixed; bottom: 0; right: 0;" class="spinnWheel">
+<div style="position: fixed; bottom: 0; right: 0;" id="spinnWheel" class="spinnWheel">
     <div class="main" id="mainSpinnner" style="position:relative ;">
         <div class="spin_block" id="spin_block">
 
@@ -35,15 +35,15 @@
 
             {% schema %}
             {
-                                    "name": "Lucky Spin",
-                                    "target": "body",
-                                    "settings":[
-                                    {
-                                    "label": "Heading",
-                                    "id": "heading",
-                                    "type": "richtext",
-                                    "default": "<p>Hello from Heading</p>"
-                                                }
-                                                ]
-                                                }
+                                                "name": "Lucky Spin",
+                                                "target": "body",
+                                                "settings":[
+                                                {
+                                                "label": "Heading",
+                                                "id": "heading",
+                                                "type": "richtext",
+                                                "default": "<p>Hello from Heading</p>"
+                                                                }
+                                                                ]
+                                                                }
             {% endschema %}
