@@ -1,6 +1,6 @@
 $(document).ready(function () {
+    console.log("Checking cookie");
     checkCookie();
-    console.log("cookie generated!");
 });
 
 var script2 = document.createElement('link');
@@ -392,11 +392,7 @@ if (mediaQuery.matches) {
 
 document.getElementById('submitSpin').addEventListener('click', spin);
 // document.getElementById('spinnerCode').addEventListener('click', copyText);
-window.addEventListener('load', (event) => {
 
-    console.log('page is fully loaded');
-});
-const myTimeout = setTimeout(myGreeting, 3000);
 
 
 function myGreeting() {
@@ -466,10 +462,23 @@ function getCookie(cname) {
 function checkCookie() {
     let spinCookie = getCookie("spinwheel-cookie");
     if (spinCookie != "") {
-        alert("Welcome again " + spinCookie);
+        console.log("Spin wheel cookie is:--> " + spinCookie);
+        document.getElementById('mainSpinnner').style.width = "0rem";
+        document.getElementById('mainSpinnner').style.height = "0rem";
+
+        document.getElementById('mainSpinnner').style.zIndex = "-1"
+        // document.getElementById('spinnWheel').style.zIndex = "0"
+
+        document.getElementById('spin_block').style.display = "none";
+        console.log('Cookie found, spin wheel closed')
     } else {
-        setCookie("spinwheel-cookie", spinwheelCookieGenerator(15), 1);
+        setCookie("spinwheel-cookie", spinwheelCookieGenerator(30), 1);
         console.log("spinwheel-cookie generated " + spinCookie);
+        window.addEventListener('load', (event) => {
+
+            console.log('page is fully loaded');
+        });
+        const myTimeout = setTimeout(myGreeting, 3000);
     }
 }
 
