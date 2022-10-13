@@ -4,7 +4,7 @@ import { readFileSync } from "fs";
 import express from "express";
 import cookieParser from "cookie-parser";
 import { Shopify, LATEST_API_VERSION } from "@shopify/shopify-api";
-
+import mongoDatabase from "./MongoDB/Connection/connectDB.js";
 import applyAuthMiddleware from "./middleware/auth.js";
 import verifyRequest from "./middleware/verify-request.js";
 import { setupGDPRWebHooks } from "./gdpr.js";
@@ -12,8 +12,15 @@ import productCreator from "./helpers/product-creator.js";
 import redirectToAuth from "./helpers/redirect-to-auth.js";
 import { BillingInterval } from "./helpers/ensure-billing.js";
 import { AppInstallations } from "./app_installations.js";
+import { createSpinCounters, getSpinCounters, singleSpinCounter, updateSpinCounters } from "./MongoDB/Controllers/SpinWheelController.js";
+import spinWheelSchema from "./MongoDB/Schema/spinWheelSchema.js";
+const SpinWheel = import('./MongoDB/Schema/spinWheelSchema.js');
+import bodyParser from "body-parser";
+import cors from "cors";
+import { createEmails, EmailsListUpdate, findEmail, getEmailsList } from "./MongoDB/Controllers/SpinWheelEmailsController.js";
 
 const USE_ONLINE_TOKENS = false;
+
 
 const PORT = parseInt(process.env.BACKEND_PORT || process.env.PORT, 10);
 
@@ -72,6 +79,9 @@ export async function createServer(
   app.set("use-online-tokens", USE_ONLINE_TOKENS);
   app.use(cookieParser(Shopify.Context.API_SECRET_KEY));
   app.use(express.json())
+  app.use(bodyParser.urlencoded({ extended: true }));
+  // app.use(cors)
+  app.use(express.urlencoded({ extended: false }));
   applyAuthMiddleware(app, {
     billing: billingSettings,
   });
@@ -80,6 +90,21 @@ export async function createServer(
   // Shopify.Webhooks.Registry.process().
   // See https://github.com/Shopify/shopify-api-node/blob/main/docs/usage/webhooks.md#note-regarding-use-of-body-parsers
   // for more details.
+
+  mongoDatabase();
+
+  // counters
+  app.get('/api/spincounters', getSpinCounters)
+  app.post('/api/spincounters/create', createSpinCounters)
+  app.put('/api/spincounters/update/:id', updateSpinCounters)
+  app.get('/api/spincounter/:id', singleSpinCounter)
+
+  // spin Emails 
+  app.post('/api/spinemail/create', createEmails);
+  app.put('/api/spinemail/update/:id', EmailsListUpdate);
+  app.get('/api/spinemails', getEmailsList);
+  app.get('/api/spinemail/one', findEmail);
+
   app.post("/api/webhooks", async (req, res) => {
     try {
       await Shopify.Webhooks.Registry.process(req, res);
@@ -92,6 +117,7 @@ export async function createServer(
     }
   });
 
+
   // All endpoints after this point will require an active session
   app.use(
     "/api/*",
@@ -99,6 +125,7 @@ export async function createServer(
       billing: billingSettings,
     })
   );
+
 
   app.get("/api/products/count", async (req, res) => {
     const session = await Shopify.Utils.loadCurrentSession(
@@ -181,23 +208,23 @@ export async function createServer(
   app.post('/api/orders', async (req, res) => {
     const session = await Shopify.Utils.loadCurrentSession(req, res, app.get("use-online-tokens"));
     try {
-      const {Order} = await import(`@shopify/shopify-api/dist/rest-resources/${LATEST_API_VERSION}/index.js`)
-        const client = new Shopify.Clients.Graphql(session.shop, session.accessToken);
-        const { reverseValue, searchCategory, forwardCursor, backwardCursor, firstNumProd, lastNumProd } = req.body
-        console.log("forwardcursor", forwardCursor);
-        const OrdersCount = await Order.count({
-          session: session,
-          status: "any",
-        });
-        const OrdersCount2 = {count:0}
-        const variables = {
-            "numProds": 7,
-            "ForwardCursor": forwardCursor,
-            "BackwardCursor": backwardCursor
-        }
-        const data = await client.query({
-            data: {
-                query: `query ($numProds: Int!, $ForwardCursor: String, $BackwardCursor: String) {
+      const { Order } = await import(`@shopify/shopify-api/dist/rest-resources/${LATEST_API_VERSION}/index.js`)
+      const client = new Shopify.Clients.Graphql(session.shop, session.accessToken);
+      const { reverseValue, searchCategory, forwardCursor, backwardCursor, firstNumProd, lastNumProd } = req.body
+      console.log("forwardcursor", forwardCursor);
+      const OrdersCount = await Order.count({
+        session: session,
+        status: "any",
+      });
+      const OrdersCount2 = { count: 0 }
+      const variables = {
+        "numProds": 7,
+        "ForwardCursor": forwardCursor,
+        "BackwardCursor": backwardCursor
+      }
+      const data = await client.query({
+        data: {
+          query: `query ($numProds: Int!, $ForwardCursor: String, $BackwardCursor: String) {
                     orders(reverse:${reverseValue}, first: ${firstNumProd}, after: $ForwardCursor, last: ${lastNumProd}, before: $BackwardCursor) {
                       edges {
                         cursor
@@ -227,17 +254,17 @@ export async function createServer(
                   }
                   `,
 
-                variables: variables
-            }
+          variables: variables
+        }
 
-        });
-        res.status(200).json({data, OrdersCount,success:true});
-        // console.log("Data", data);
+      });
+      res.status(200).json({ data, OrdersCount, success: true });
+      // console.log("Data", data);
     } catch (error) {
-        console.log("Error" + error);
-        res.status(200).json({error, success:false});
+      console.log("Error" + error);
+      res.status(200).json({ error, success: false });
     }
-})
+  })
 
   app.get("/api/products/create", async (req, res) => {
     const session = await Shopify.Utils.loadCurrentSession(

@@ -1,14 +1,18 @@
 $(document).ready(function () {
     console.log("Checking cookie");
+
     checkCookie();
 });
 
+// openSpinCounter();
+// addSpinnedEmails()
 var script2 = document.createElement('link');
 script2.rel = 'stylesheet';
 script2.href = 'https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css';
 document.getElementsByTagName('head')[0].appendChild(script2);
 
 console.log("Script Added", script2);
+getSpinnedCounter();
 
 var padding;
 var container;
@@ -182,11 +186,11 @@ arcs.append("text").attr("transform", function (d) {
     });
 container.on("click", spin);
 
-function spin(d) {
+async function spin(d) {
 
     // email validation
 
-    console.log("werwer");
+    console.log("Welcome to the Spinner!");
     var x = document.myform.email.value;
     var atposition = x.indexOf("@");
     var dotposition = x.lastIndexOf(".");
@@ -202,60 +206,79 @@ function spin(d) {
                 return alert("Enter Email to spin");
             }
             d.preventDefault();
-            container.on("click", null);
-            //all slices have been seen, all done
-            console.log("OldPick: " + oldpick.length, "Data length: " + data.length);
-            if (oldpick.length == data.length) {
-                console.log("done");
-                container.on("click", null);
-                return;
-            }
-            if (oldpick.length > 0) {
-                console.log("done");
-                container.on("click", null);
-                alert('Spin completed!!')
-                return;
-            }
-            var ps = 360 / data.length,
-                pieslice = Math.round(1440 / data.length),
-                rng = Math.floor((Math.random() * 1440) + 360);
+            // addSpinnedEmails();
+            const email = document.getElementById('spinner-email').value
 
-            rotation = (Math.round(rng / ps) * ps);
+            const config = {
+                headers: {
+                    "ngrok-skip-browser-warning": "false"
+                }
+            }
+            const addEmail = await axios.get(`https://aa22-2405-201-200c-69d7-898e-cf84-e44-c48c.in.ngrok.io/api/spinemail/one?email=${email}`, config);
+            console.log("Email Found:-->", addEmail.data.found);
+            if (addEmail.data.found === null) {
+                addSpinnedEmails();
 
-            picked = Math.round(data.length - (rotation % 360) / ps);
-            picked = picked >= data.length ? (picked % data.length) : picked;
-            if (oldpick.indexOf(picked) !== -1) {
-                d3.select(this).call(spin);
-                return;
+
+
+                container.on("click", null);
+                //all slices have been seen, all done
+                console.log("OldPick: " + oldpick.length, "Data length: " + data.length);
+                if (oldpick.length == data.length) {
+                    console.log("done");
+                    container.on("click", null);
+                    return;
+                }
+                if (oldpick.length > 0) {
+                    console.log("done");
+                    container.on("click", null);
+                    alert('Spin completed!!')
+                    return;
+                }
+                var ps = 360 / data.length,
+                    pieslice = Math.round(1440 / data.length),
+                    rng = Math.floor((Math.random() * 1440) + 360);
+
+                rotation = (Math.round(rng / ps) * ps);
+
+                picked = Math.round(data.length - (rotation % 360) / ps);
+                picked = picked >= data.length ? (picked % data.length) : picked;
+                if (oldpick.indexOf(picked) !== -1) {
+                    d3.select(this).call(spin);
+                    return;
+                } else {
+                    oldpick.push(picked);
+                }
+                rotation += 90 - Math.round(ps / 2);
+                vis.transition()
+                    .duration(3000)
+                    .attrTween("transform", rotTween)
+                    .each("end", function () {
+                        //mark offerText as seen
+                        d3.select(".slice:nth-child(" + (picked + 1) + ") path")
+                            .attr("fill", "transparent");
+                        //populate offerText
+                        d3.select("#offerText h1")
+                            .text(data[picked].offerText);
+                        d3.select("#spinnerCode")
+                            .attr('value', data[picked].offerCode);
+                        oldrotation = rotation;
+
+                        /* Get the result value from object "data" */
+                        console.log(data[picked].value)
+
+                        /* Comment the below line for restrict spin to sngle time */
+                        container.on("click", spin);
+                        spinnedSpinCounter();
+
+                    });
             } else {
-                oldpick.push(picked);
+                alert("Spin Completed!!");
             }
-            rotation += 90 - Math.round(ps / 2);
-            vis.transition()
-                .duration(3000)
-                .attrTween("transform", rotTween)
-                .each("end", function () {
-                    //mark offerText as seen
-                    d3.select(".slice:nth-child(" + (picked + 1) + ") path")
-                        .attr("fill", "transparent");
-                    //populate offerText
-                    d3.select("#offerText h1")
-                        .text(data[picked].offerText);
-                    d3.select("#spinnerCode")
-                        .attr('value', data[picked].offerCode);
-                    oldrotation = rotation;
-
-                    /* Get the result value from object "data" */
-                    console.log(data[picked].value)
-
-                    /* Comment the below line for restrict spin to sngle time */
-                    container.on("click", spin);
-                });
         } catch (error) {
             console.log(error);
         }
     }
-
 }
 //make arrow
 function spinArrow(t1, t2) {
@@ -350,24 +373,9 @@ function getRandomNumbers() {
     return array;
 }
 
-document.getElementById('spinnerImage').onclick = function () {
-
-    console.log("image clicked");
-    if (document.getElementById('spin_block').style.display == "none") {
-        document.getElementById('spin_block').style.display = "flex";
-
-        document.getElementById('mainSpinnner').style.zIndex = "999999";
-        // document.getElementById('spinnWheel').style.zIndex = "999999";
-        // document.getElementById('spinnWheel').style.zIndex = "999999999";
-        //    document.getElementById('spin_block').style.flexDirection = "column";
-        //    document.getElementById('spin_block').style.justifyContent = "center";
-        //    document.getElementById('spin_block').style.alignItems = "center";
-        document.getElementById('mainSpinnner').style.width = "100vw";
-        document.getElementById('mainSpinnner').style.height = "100%";
-        // document.getElementById('MainContent').style.zIndex = "-1"
-        console.log('opened')
-    } else {
-        // document.getElementById('spin_block').style.zIndex = "-1";
+document.getElementById('closeSpin').onclick = function () {
+    closeSpinCounter();
+    if (document.getElementById('spin_block').style.display == "flex") {
         document.getElementById('mainSpinnner').style.width = "0rem";
         document.getElementById('mainSpinnner').style.height = "0rem";
 
@@ -376,6 +384,23 @@ document.getElementById('spinnerImage').onclick = function () {
 
         document.getElementById('spin_block').style.display = "none";
         console.log('closed')
+    }
+}
+document.getElementById('spinnerImage').onclick = function () {
+    openSpinCounter();
+    console.log("image clicked");
+    if (document.getElementById('spin_block').style.display == "none") {
+        document.getElementById('spin_block').style.display = "flex";
+
+        document.getElementById('mainSpinnner').style.zIndex = "999999";
+        // document.getElementById('spinnWheel').style.zIndex = "999999999";
+        //    document.getElementById('spin_block').style.flexDirection = "column";
+        //    document.getElementById('spin_block').style.justifyContent = "center";
+        //    document.getElementById('spin_block').style.alignItems = "center";
+        document.getElementById('mainSpinnner').style.width = "100vw";
+        document.getElementById('mainSpinnner').style.height = "100%";
+        // document.getElementById('MainContent').style.zIndex = "-1"
+        console.log('opened')
     }
 }
 const mediaQuery = window.matchMedia('(max-width: 730px)')
@@ -396,8 +421,8 @@ document.getElementById('submitSpin').addEventListener('click', spin);
 
 
 function myGreeting() {
-
     document.getElementById('spin_block').style.display = "flex";
+    openSpinCounter();
     console.log('Hello world3333');
 }
 
@@ -482,4 +507,151 @@ function checkCookie() {
     }
 }
 
+async function getSpinnedCounter(){
+    const config2 = {
+        headers: {
+            "ngrok-skip-browser-warning": "false",
+        },
+    }
+    const allCounters = await axios.get(`https://aa22-2405-201-200c-69d7-898e-cf84-e44-c48c.in.ngrok.io/api/spincounters`, config2);
+    const doc = allCounters.data.data[0];
+    console.log(doc.spinned);
+    document.getElementById('spinCounter').innerHTML = `Spinned by ${doc.spinned} people`;
+}
+async function openSpinCounter() {
+    const config2 = {
+        headers: {
+            "ngrok-skip-browser-warning": "false",
+        },
+    }
+    const allCounters = await axios.get(`https://aa22-2405-201-200c-69d7-898e-cf84-e44-c48c.in.ngrok.io/api/spincounters`, config2);
+    const doc = allCounters.data.data[0];
+    if (!doc) {
+        createSpinDoc(1, 0, 0);
+    }
+    console.log("Counters", doc);
+    const counterValues = {
+        "openedSpinwheel": doc.openedSpinwheel + 1,
 
+
+    }
+    const config = {
+        headers: {
+            "ngrok-skip-browser-warning": "false",
+        },
+        body: JSON.stringify(counterValues),
+    }
+    const { data } = await axios.put(`https://aa22-2405-201-200c-69d7-898e-cf84-e44-c48c.in.ngrok.io/api/spincounters/update/${doc._id}`, counterValues, config);
+    console.log("Opened Counter :-->", data);
+}
+async function closeSpinCounter() {
+    const config2 = {
+        headers: {
+            "ngrok-skip-browser-warning": "false",
+        },
+    }
+    const allCounters = await axios.get(`https://aa22-2405-201-200c-69d7-898e-cf84-e44-c48c.in.ngrok.io/api/spincounters`, config2);
+    const doc = allCounters.data.data[0];
+    if (!doc) {
+        createSpinDoc(0, 1, 0);
+    }
+    console.log("Counters", doc);
+    const counterValues = {
+        "closedSpinwheel": doc.closedSpinwheel + 1,
+    }
+    const config = {
+        headers: {
+            "ngrok-skip-browser-warning": "false",
+        },
+        body: JSON.stringify(counterValues),
+    }
+    const { data } = await axios.put(`https://aa22-2405-201-200c-69d7-898e-cf84-e44-c48c.in.ngrok.io/api/spincounters/update/${doc._id}`, counterValues, config);
+    console.log("Closed Counter :-->", data);
+}
+
+async function spinnedSpinCounter() {
+    const config2 = {
+        headers: {
+            "ngrok-skip-browser-warning": "false",
+        },
+    }
+    const allCounters = await axios.get(`https://aa22-2405-201-200c-69d7-898e-cf84-e44-c48c.in.ngrok.io/api/spincounters`, config2);
+    const doc = allCounters.data.data[0];
+    if (!doc) {
+        createSpinDoc(0, 0, 1);
+    }
+    console.log("Counters", doc);
+    const counterValues = {
+        "spinned": doc.spinned + 1,
+    }
+    const config = {
+        headers: {
+            "ngrok-skip-browser-warning": "false",
+        },
+        body: JSON.stringify(counterValues),
+    }
+    const { data } = await axios.put(`https://aa22-2405-201-200c-69d7-898e-cf84-e44-c48c.in.ngrok.io/api/spincounters/update/${doc._id}`, counterValues, config);
+    console.log("Spinneed Counter Updated :-->", data);
+}
+
+
+async function createSpinDoc(a, b, c) {
+    const createDoc = {
+        "openedSpinwheel": a,
+        "closedSpinwheel": b,
+        "spinned": c
+    }
+    const config3 = {
+        headers: {
+            "ngrok-skip-browser-warning": "false",
+        },
+        body: JSON.stringify(createDoc)
+    }
+    const createSpinCounterDoc = await axios.post(`https://aa22-2405-201-200c-69d7-898e-cf84-e44-c48c.in.ngrok.io/api/spincounters/create`, createDoc, config3);
+    console.log("Counter created :-->", createSpinCounterDoc);
+}
+
+
+async function addSpinnedEmails() {
+    const config = {
+        headers: {
+            "ngrok-skip-browser-warning": "false",
+        },
+    }
+    const newEmail = {
+        totalEmails: document.getElementById('spinner-email').value
+    }
+    const config2 = {
+        headers: {
+            "ngrok-skip-browser-warning": "false"
+        },
+        body: JSON.stringify(newEmail)
+    }
+    console.log(document.getElementById('spinner-email').value);
+    const getAllEmails = await axios.get(`https://aa22-2405-201-200c-69d7-898e-cf84-e44-c48c.in.ngrok.io/api/spinemails`, config);
+    console.log("All Emails :-->", getAllEmails);
+
+
+    const getOneDoc = getAllEmails.data.emails[0]
+    if (!getOneDoc) {
+        createEmailDoc()
+    }
+    console.log("One Doc :-->", getOneDoc);
+    const addEmail = await axios.put(`https://aa22-2405-201-200c-69d7-898e-cf84-e44-c48c.in.ngrok.io/api/spinemail/update/${getOneDoc._id}`, newEmail, config2);
+    console.log("Email Added Successfully", addEmail);
+}
+
+
+async function createEmailDoc() {
+    const newEmail = {
+        totalEmails: document.getElementById('spinner-email').value
+    }
+    const config = {
+        headers: {
+            "ngrok-skip-browser-warning": "false"
+        },
+        body: JSON.stringify(newEmail)
+    }
+    const addEmail = await axios.post(`https://aa22-2405-201-200c-69d7-898e-cf84-e44-c48c.in.ngrok.io/api/spinemail/create`, newEmail, config);
+    console.log("New Email Added Successfully", addEmail);
+}
