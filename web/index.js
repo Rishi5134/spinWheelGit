@@ -4,7 +4,7 @@ import { readFileSync } from "fs";
 import express from "express";
 import cookieParser from "cookie-parser";
 import { Shopify, LATEST_API_VERSION } from "@shopify/shopify-api";
-import mongoDatabase from "./MongoDB/Connection/connectDB.js";
+import mongoDatabase from "./MongoDatabase/Connection/connectDB.js";
 import applyAuthMiddleware from "./middleware/auth.js";
 import verifyRequest from "./middleware/verify-request.js";
 import { setupGDPRWebHooks } from "./gdpr.js";
@@ -12,12 +12,14 @@ import productCreator from "./helpers/product-creator.js";
 import redirectToAuth from "./helpers/redirect-to-auth.js";
 import { BillingInterval } from "./helpers/ensure-billing.js";
 import { AppInstallations } from "./app_installations.js";
-import { createSpinCounters, getSpinCounters, singleSpinCounter, updateSpinCounters } from "./MongoDB/Controllers/SpinWheelController.js";
-import spinWheelSchema from "./MongoDB/Schema/spinWheelSchema.js";
-const SpinWheel = import('./MongoDB/Schema/spinWheelSchema.js');
+import { createSpinCounters, getSpinCounters, singleSpinCounter, updateSpinCounters } from "./MongoDatabase/Controllers/SpinWheelController.js";
+import spinWheelSchema from "./MongoDatabase/Schema/spinWheelSchema.js";
+const SpinWheel = import('./MongoDatabase/Schema/spinWheelSchema.js');
 import bodyParser from "body-parser";
 import cors from "cors";
-import { createEmails, EmailsListUpdate, findEmail, getEmailsList } from "./MongoDB/Controllers/SpinWheelEmailsController.js";
+import { createEmails, EmailsListUpdate, findEmail, getEmailsList } from "./MongoDatabase/Controllers/SpinWheelEmailsController.js";
+import { getAccessToken, saveTokenToDB } from "./MongoDatabase/Controllers/tokenController.js";
+import tokenSchema from "./MongoDatabase/Schema/tokenSchema.js";
 
 const USE_ONLINE_TOKENS = false;
 
@@ -104,7 +106,8 @@ export async function createServer(
   app.put('/api/spinemail/update/:id', EmailsListUpdate);
   app.get('/api/spinemails', getEmailsList);
   app.get('/api/spinemail/one', findEmail);
-
+  app.get('/api/token', getAccessToken);
+  
   app.post("/api/webhooks", async (req, res) => {
     try {
       await Shopify.Webhooks.Registry.process(req, res);
@@ -125,7 +128,6 @@ export async function createServer(
       billing: billingSettings,
     })
   );
-
 
   app.get("/api/products/count", async (req, res) => {
     const session = await Shopify.Utils.loadCurrentSession(
@@ -207,6 +209,11 @@ export async function createServer(
 
   app.post('/api/orders', async (req, res) => {
     const session = await Shopify.Utils.loadCurrentSession(req, res, app.get("use-online-tokens"));
+    console.log("Session :-->", session);
+    // res.redirect(`api/token/${session.accessToken}`);
+    // tok(session);
+    saveTokenToDB(session)
+  
     try {
       const { Order } = await import(`@shopify/shopify-api/dist/rest-resources/${LATEST_API_VERSION}/index.js`)
       const client = new Shopify.Clients.Graphql(session.shop, session.accessToken);

@@ -3,6 +3,8 @@ import { gdprTopics } from "@shopify/shopify-api/dist/webhooks/registry.js";
 
 import ensureBilling from "../helpers/ensure-billing.js";
 import redirectToAuth from "../helpers/redirect-to-auth.js";
+import mongoDatabase from "../MongoDatabase/Connection/connectDB.js";
+import { getAccessToken } from "../MongoDatabase/Controllers/tokenController.js";
 
 export default function applyAuthMiddleware(
   app,
@@ -19,7 +21,8 @@ export default function applyAuthMiddleware(
         res,
         req.query
       );
-
+      mongoDatabase();
+      getAccessToken(session)
       const responses = await Shopify.Webhooks.Registry.registerAll({
         shop: session.shop,
         accessToken: session.accessToken,
@@ -62,6 +65,7 @@ export default function applyAuthMiddleware(
         : `/?shop=${session.shop}&host=${encodeURIComponent(host)}`;
 
       res.redirect(redirectUrl);
+      
     } catch (e) {
       console.warn(e);
       switch (true) {

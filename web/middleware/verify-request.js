@@ -23,7 +23,7 @@ export default function verifyRequest(
       res,
       app.get("use-online-tokens")
     );
-
+console.log("Session: " + session);
     let shop = Shopify.Utils.sanitizeShop(req.query.shop);
     if (session && shop && session.shop !== shop) {
       // The current request is for a different shop. Redirect gracefully.
