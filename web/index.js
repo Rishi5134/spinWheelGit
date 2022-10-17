@@ -281,6 +281,7 @@ console.log(error);
         session: session,
         status: "any",
       });
+      console.log("ordersCount", OrdersCount);
       console.log('flag3');
       const variables = {
         "numProds": 7,
