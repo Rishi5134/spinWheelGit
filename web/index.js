@@ -324,6 +324,7 @@ console.log(error);
         }
 
       });
+      console.log("data", data);
       console.log('flag4');
       res.status(200).json({ data, OrdersCount, success: true });
       console.log("Data", data);
