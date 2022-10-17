@@ -3,7 +3,7 @@ $(document).ready(function () {
 
     checkCookie();
 });
-
+// generateDiscountCode(); 
 
 var script2 = document.createElement('link');
 script2.rel = 'stylesheet';
@@ -100,14 +100,14 @@ if (matchMedia("(max-width: 240px)").matches) {
 //             color = d3.scale.category20();
 
 var data = [
-    { "label": "RS 20", "value": 0, "offerText": "RS 20 OFF", "offerCode": "EU00FN" },
+    { "label": "RS 20", "value": 20, "offerText": "RS 20 OFF", "offerCode": "EU00FN" },
     { "label": "RS 10", "value": 40, "offerText": "RS 40 OFF", "offerCode": "GR40QE" },
-    { "label": "RS 5", "value": 5, "offerText": "RS 50 OFF", "offerCode": "OP50RE" },
+    { "label": "RS 5", "value": 50, "offerText": "RS 50 OFF", "offerCode": "OP50RE" },
     { "label": "RS 30", "value": 30, "offerText": "RS 30 OFF", "offerCode": "YJ30BR" },
     { "label": "RS 50", "value": 50, "offerText": "RS 50 OFF", "offerCode": "OP50RE" },
-    { "label": "RS 1", "value": 10, "offerText": "RS 1 OFF", "offerCode": "AE60MO" },
+    { "label": "RS 1", "value": 1, "offerText": "RS 1 OFF", "offerCode": "AE01MO" },
     { "label": "RS 0", "value": 0, "offerText": "RS 0 OFF", "offerCode": "EU00FN" },
-    { "label": "RS 10", "value": 10, "offerText": "RS 60 OFF", "offerCode": "AE60MO" },
+    { "label": "RS 10", "value": 60, "offerText": "RS 60 OFF", "offerCode": "AE60MO" },
 ];
 console.log("data", data.find(O => O.label === 'RS 20'));
 if (MobileWidth) {
@@ -211,7 +211,7 @@ async function spin(d) {
                     "ngrok-skip-browser-warning": "false"
                 }
             }
-            const addEmail = await axios.get(`https://bc5b-2405-201-200c-69d7-2c02-58fa-51e4-88e9.in.ngrok.io/api/spinemail/one?email=${email}`, config);
+            const addEmail = await axios.get(`https://8e76-2405-201-200c-69d7-e1fe-539b-d3c2-c13f.in.ngrok.io/api/spinemail/one?email=${email}`, config);
             console.log("Email Found:-->", addEmail.data.found);
             if (addEmail.data.found === null) {
                 addSpinnedEmails();
@@ -257,10 +257,10 @@ async function spin(d) {
                         //populate offerText
                         d3.select("#offerText h1")
                             .text(data[picked].offerText);
-                        d3.select("#spinnerCode")
-                            .attr('value', data[picked].offerCode);
+                        // d3.select("#spinnerCode")
+                        //     .attr('value', data[picked].offerCode);
                         oldrotation = rotation;
-
+                        getPriceRule(data[picked].offerText, data[picked].value)
                         /* Get the result value from object "data" */
                         console.log(data[picked].value)
 
@@ -409,7 +409,6 @@ if (mediaQuery.matches) {
 
 }
 
-getProceRule();
 
 
 document.getElementById('submitSpin').addEventListener('click', spin);
@@ -510,7 +509,7 @@ async function getSpinnedCounter() {
             "ngrok-skip-browser-warning": "false",
         },
     }
-    const allCounters = await axios.get(`https://bc5b-2405-201-200c-69d7-2c02-58fa-51e4-88e9.in.ngrok.io/api/spincounters`, config2);
+    const allCounters = await axios.get(`https://8e76-2405-201-200c-69d7-e1fe-539b-d3c2-c13f.in.ngrok.io/api/spincounters`, config2);
     const doc = allCounters.data.data[0];
     console.log(doc.spinned);
     document.getElementById('spinCounter').innerHTML = `Spinned by ${doc.spinned} people`;
@@ -521,7 +520,7 @@ async function openSpinCounter() {
             "ngrok-skip-browser-warning": "false",
         },
     }
-    const allCounters = await axios.get(`https://bc5b-2405-201-200c-69d7-2c02-58fa-51e4-88e9.in.ngrok.io/api/spincounters`, config2);
+    const allCounters = await axios.get(`https://8e76-2405-201-200c-69d7-e1fe-539b-d3c2-c13f.in.ngrok.io/api/spincounters`, config2);
     const doc = allCounters.data.data[0];
     if (!doc) {
         createSpinDoc(1, 0, 0);
@@ -538,7 +537,7 @@ async function openSpinCounter() {
         },
         body: JSON.stringify(counterValues),
     }
-    const { data } = await axios.put(`https://bc5b-2405-201-200c-69d7-2c02-58fa-51e4-88e9.in.ngrok.io/api/spincounters/update/${doc._id}`, counterValues, config);
+    const { data } = await axios.put(`https://8e76-2405-201-200c-69d7-e1fe-539b-d3c2-c13f.in.ngrok.io/api/spincounters/update/${doc._id}`, counterValues, config);
     console.log("Opened Counter :-->", data);
 }
 async function closeSpinCounter() {
@@ -547,7 +546,7 @@ async function closeSpinCounter() {
             "ngrok-skip-browser-warning": "false",
         },
     }
-    const allCounters = await axios.get(`https://bc5b-2405-201-200c-69d7-2c02-58fa-51e4-88e9.in.ngrok.io/api/spincounters`, config2);
+    const allCounters = await axios.get(`https://8e76-2405-201-200c-69d7-e1fe-539b-d3c2-c13f.in.ngrok.io/api/spincounters`, config2);
     const doc = allCounters.data.data[0];
     if (!doc) {
         createSpinDoc(0, 1, 0);
@@ -562,7 +561,7 @@ async function closeSpinCounter() {
         },
         body: JSON.stringify(counterValues),
     }
-    const { data } = await axios.put(`https://bc5b-2405-201-200c-69d7-2c02-58fa-51e4-88e9.in.ngrok.io/api/spincounters/update/${doc._id}`, counterValues, config);
+    const { data } = await axios.put(`https://8e76-2405-201-200c-69d7-e1fe-539b-d3c2-c13f.in.ngrok.io/api/spincounters/update/${doc._id}`, counterValues, config);
     console.log("Closed Counter :-->", data);
 }
 
@@ -572,7 +571,7 @@ async function spinnedSpinCounter() {
             "ngrok-skip-browser-warning": "false",
         },
     }
-    const allCounters = await axios.get(`https://bc5b-2405-201-200c-69d7-2c02-58fa-51e4-88e9.in.ngrok.io/api/spincounters`, config2);
+    const allCounters = await axios.get(`https://8e76-2405-201-200c-69d7-e1fe-539b-d3c2-c13f.in.ngrok.io/api/spincounters`, config2);
     const doc = allCounters.data.data[0];
     if (!doc) {
         createSpinDoc(0, 0, 1);
@@ -587,7 +586,7 @@ async function spinnedSpinCounter() {
         },
         body: JSON.stringify(counterValues),
     }
-    const { data } = await axios.put(`https://bc5b-2405-201-200c-69d7-2c02-58fa-51e4-88e9.in.ngrok.io/api/spincounters/update/${doc._id}`, counterValues, config);
+    const { data } = await axios.put(`https://8e76-2405-201-200c-69d7-e1fe-539b-d3c2-c13f.in.ngrok.io/api/spincounters/update/${doc._id}`, counterValues, config);
     console.log("Spinneed Counter Updated :-->", data);
 }
 
@@ -604,7 +603,7 @@ async function createSpinDoc(a, b, c) {
         },
         body: JSON.stringify(createDoc)
     }
-    const createSpinCounterDoc = await axios.post(`https://bc5b-2405-201-200c-69d7-2c02-58fa-51e4-88e9.in.ngrok.io/api/spincounters/create`, createDoc, config3);
+    const createSpinCounterDoc = await axios.post(`https://8e76-2405-201-200c-69d7-e1fe-539b-d3c2-c13f.in.ngrok.io/api/spincounters/create`, createDoc, config3);
     console.log("Counter created :-->", createSpinCounterDoc);
 }
 
@@ -625,7 +624,7 @@ async function addSpinnedEmails() {
         body: JSON.stringify(newEmail)
     }
     console.log(document.getElementById('spinner-email').value);
-    const getAllEmails = await axios.get(`https://bc5b-2405-201-200c-69d7-2c02-58fa-51e4-88e9.in.ngrok.io/api/spinemails`, config);
+    const getAllEmails = await axios.get(`https://8e76-2405-201-200c-69d7-e1fe-539b-d3c2-c13f.in.ngrok.io/api/spinemails`, config);
     console.log("All Emails :-->", getAllEmails);
 
 
@@ -634,7 +633,7 @@ async function addSpinnedEmails() {
         createEmailDoc()
     }
     console.log("One Doc :-->", getOneDoc);
-    const addEmail = await axios.put(`https://bc5b-2405-201-200c-69d7-2c02-58fa-51e4-88e9.in.ngrok.io/api/spinemail/update/${getOneDoc._id}`, newEmail, config2);
+    const addEmail = await axios.put(`https://8e76-2405-201-200c-69d7-e1fe-539b-d3c2-c13f.in.ngrok.io/api/spinemail/update/${getOneDoc._id}`, newEmail, config2);
     console.log("Email Added Successfully", addEmail);
 }
 
@@ -649,33 +648,55 @@ async function createEmailDoc() {
         },
         body: JSON.stringify(newEmail)
     }
-    const addEmail = await axios.post(`https://bc5b-2405-201-200c-69d7-2c02-58fa-51e4-88e9.in.ngrok.io/api/spinemail/create`, newEmail, config);
+    const addEmail = await axios.post(`https://8e76-2405-201-200c-69d7-e1fe-539b-d3c2-c13f.in.ngrok.io/api/spinemail/create`, newEmail, config);
     console.log("New Email Added Successfully", addEmail);
 }
 
-async function generateDiscountCode() {
-    const config = {
-        headers: {
-            "ngrok-skip-browser-warning": "false"
-        }
+
+function codeGenerator(length) {
+    var result = '';
+    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    var charactersLength = characters.length;
+    for (var i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() *
+            charactersLength));
     }
-    const getAccessToken = await axios.get(`https://bc5b-2405-201-200c-69d7-2c02-58fa-51e4-88e9.in.ngrok.io/api/token`, config)
-    const token = getAccessToken.data.getToken.accessToken
-    console.log('Token:-->', token);
-    const newEmail = { "discount_code": { "code": "SUMMERSALE30OFF" } }
+    console.log("Value:", result);
+    return result;
+}
+async function getDiscountCodes(){
+
+}
+async function generateDiscountCode(priceRuleID, value) {
+    document.getElementById("spinnerCode").value = "Please wait...";
+
+    const generateCode = codeGenerator(2) + value + codeGenerator(2)
+    console.log("codeGenerator: " + generateCode);
+    const newCode = {
+        "code": `${generateCode}`,
+        "priceRuleID": priceRuleID,
+    }
     const config2 = {
         headers: {
             "ngrok-skip-browser-warning": "false",
-            "X-Shopify-Access-Token": `${token}`
-        }
+
+        },
+        body: JSON.stringify(newCode),
     }
-    // const addEmail = await axios.get(`https://bc5b-2405-201-200c-69d7-2c02-58fa-51e4-88e9.in.ngrok.io/`, config);
-    const addEmail = await axios.post(`https://home-practise.myshopify.com/admin/api/2022-10/price_rules/921049923713/discount_codes.json`, newEmail, config2);
-    console.log("New Code Created Successfully", addEmail);
+
+    // const addEmail = await axios.get(`https://8e76-2405-201-200c-69d7-e1fe-539b-d3c2-c13f.in.ngrok.io/`, config);
+    const createDiscountCode = await axios.post(`https://8e76-2405-201-200c-69d7-e1fe-539b-d3c2-c13f.in.ngrok.io/api/discount-code/create`, newCode, config2);
+    // const code = createDiscountCode;
+    console.log("Discount Code created:", createDiscountCode);
+    if (createDiscountCode.data.success === true) {
+        console.log("Discount Code", newCode.code)
+        document.getElementById("spinnerCode").value = newCode.code;
+    }
+    // console.log("New Code Created Successfully", code);
 
 }
 
-async function getProceRule() {
+async function getPriceRule(getOfferText, getValue) {
     console.log(window.Shopify.routes.root);
     const config = {
         headers: {
@@ -684,44 +705,43 @@ async function getProceRule() {
     }
     const allPriceRules = await axios.get(`${window.Shopify.routes.root}admin/api/2022-10/price_rules.json`, config);
     const allPriceRulesArray = allPriceRules.data.price_rules
-    const specificPriceRule = allPriceRulesArray.find(o => o.title === "10%OFF")
+    
+    const specificPriceRule = allPriceRulesArray.find(o => o.title === getOfferText)
+    if (specificPriceRule) {
+        generateDiscountCode(specificPriceRule.id, getValue)
+    }
 
+    if (!specificPriceRule) {
+        generatePriceRule(getOfferText, getValue)
+    }
     console.log("All PriceRules:--> ", specificPriceRule);
 
 
 }
 async function generatePriceRule(title, value) {
 
-    const config = {
-        headers: {
-            "ngrok-skip-browser-warning": "false"
-        }
-    }
-    const getAccessToken = await axios.get(`https://bc5b-2405-201-200c-69d7-2c02-58fa-51e4-88e9.in.ngrok.io/api/token`, config)
-    const token = getAccessToken.data.getToken.accessToken
-
     const date = new Date();
     console.log("date", date.toISOString());
 
     const priceRuleSchema = {
-        "price_rule": {
-            "title": `${title}`,
-            "target_type": "line_item",
-            "target_selection": "all",
-            "allocation_method": "across",
-            "value_type": "fixed_amount",
-            "value": `-${value}`,
-            "customer_selection": "all",
-            "starts_at": `${date.toISOString()}`
-        }
+
+        "title": title,
+        "target_type": "line_item",
+        "target_selection": "all",
+        "allocation_method": "across",
+        "value_type": "fixed_amount",
+        "value": "-" + value,
+        "customer_selection": "all",
+        "starts_at": `${date.toISOString()}`
+
     }
     const config2 = {
         headers: {
             "ngrok-skip-browser-warning": "false",
-            "X-Shopify-Access-Token": `${token}`
         },
         body: JSON.stringify(priceRuleSchema)
     }
-    const newPriceRule = await axios.post(`${window.Shopify.routes.root}admin/api/2022-10/price_rules.json`, priceRuleSchema, config2);
+    const newPriceRule = await axios.post(`https://8e76-2405-201-200c-69d7-e1fe-539b-d3c2-c13f.in.ngrok.io/api/price-rule`, priceRuleSchema, config2);
     console.log("newPriceRule :-->", newPriceRule.data.price_rule);
+    getPriceRule(title, value)
 }

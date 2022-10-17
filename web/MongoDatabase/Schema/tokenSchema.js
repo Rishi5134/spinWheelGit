@@ -1,11 +1,35 @@
 import mongoose from "mongoose";
 
 const tokenSchema = new mongoose.Schema({
-    accessToken :{
-        type: String,
-        required: true,
-        
-    },
+ 
+            id:{
+
+                type: String,
+                required: true,
+            },
+            shop:{
+                type: String,
+                required: true,
+
+            },
+            state:{
+                type: String,
+                required: true,
+            },
+            isOnline:{
+                type: String,
+                required: true,
+            },
+            scope:{
+                type: String,
+                required: true,
+            },
+            accessToken:{
+                type: String,
+                required: true,
+            },
+            
+    
     
 })
 

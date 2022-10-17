@@ -12,6 +12,7 @@ import productCreator from "./helpers/product-creator.js";
 import redirectToAuth from "./helpers/redirect-to-auth.js";
 import { BillingInterval } from "./helpers/ensure-billing.js";
 import { AppInstallations } from "./app_installations.js";
+import axios from 'axios'
 import { createSpinCounters, getSpinCounters, singleSpinCounter, updateSpinCounters } from "./MongoDatabase/Controllers/SpinWheelController.js";
 import spinWheelSchema from "./MongoDatabase/Schema/spinWheelSchema.js";
 const SpinWheel = import('./MongoDatabase/Schema/spinWheelSchema.js');
@@ -107,7 +108,100 @@ export async function createServer(
   app.get('/api/spinemails', getEmailsList);
   app.get('/api/spinemail/one', findEmail);
   app.get('/api/token', getAccessToken);
-  
+
+  app.post("/api/price-rule", async (req, res) => {
+
+    const config = {
+      headers: {
+        "ngrok-skip-browser-warning": "false"
+      }
+    }
+    const getAccessToken = await axios.get(`https://8e76-2405-201-200c-69d7-e1fe-539b-d3c2-c13f.in.ngrok.io/api/token`, config)
+    const token = getAccessToken.data.getToken
+    // console.log("token: " + token);
+    const session = await Shopify.Utils.loadCurrentSession(
+      req,
+      res,
+      app.get("use-online-tokens")
+    );
+
+    const { PriceRule } = await import(`@shopify/shopify-api/dist/rest-resources/${Shopify.Context.API_VERSION}/index.js`);
+
+    try {
+      const price_rule = new PriceRule({ session: token });
+      const { title, target_type, target_selection, allocation_method, value_type, value, customer_selection, starts_at } = req.body
+      price_rule.title = title;
+      price_rule.target_type = target_type;
+      price_rule.target_selection = target_selection;
+      price_rule.allocation_method = allocation_method;
+      price_rule.value_type = value_type;
+      price_rule.value = value;
+      price_rule.customer_selection = customer_selection;
+      price_rule.starts_at = starts_at;
+      const priceRule = await price_rule.save({
+        update: true,
+      });
+      res.status(200).json({ success: true, priceRule })
+      console.log("priceRule", priceRule);
+    } catch (e) {
+      console.log(`Error`, e);
+      res.status(500).json({ error: e });
+    }
+  });
+
+  app.get('/api/allpricerules', async (req, res) => {
+
+    const session = await Shopify.Utils.loadCurrentSession(
+      req,
+      res,
+      app.get("use-online-tokens")
+    );
+
+    const { PriceRule } = await import(`@shopify/shopify-api/dist/rest-resources/${Shopify.Context.API_VERSION}/index.js`);
+
+    try {
+      const allPriceRule = await PriceRule.all({
+        session: session,
+      });
+      res.status(200).json({ success: true, allPriceRule })
+    } catch (error) {
+      res.status(200).json({ success: false, error })
+
+      
+    }
+  })
+
+  app.post("/api/discount-code/create", async (req, res) => {
+
+    const config = {
+      headers: {
+        "ngrok-skip-browser-warning": "false"
+      }
+    }
+    const getAccessToken = await axios.get(`https://8e76-2405-201-200c-69d7-e1fe-539b-d3c2-c13f.in.ngrok.io/api/token`, config)
+    const token = getAccessToken.data.getToken
+
+    const session = await Shopify.Utils.loadCurrentSession(
+      req,
+      res,
+      app.get("use-online-tokens")
+    );
+    const { DiscountCode } = await import(`@shopify/shopify-api/dist/rest-resources/${Shopify.Context.API_VERSION}/index.js`);
+    const { code, priceRuleID } = req.body
+    try {
+      const discount_code = new DiscountCode({ session: token });
+      discount_code.price_rule_id = priceRuleID;
+      discount_code.code = code;
+      const discount = await discount_code.save({
+        update: true,
+      });
+      console.log("discount", discount);
+      res.status(200).json({ success: true, message: "Discount Code created successfully", discount })
+    } catch (error) {
+      res.status(200).json({ success: false, error })
+      console.log("Errroor", error);
+    }
+  })
   app.post("/api/webhooks", async (req, res) => {
     try {
       await Shopify.Webhooks.Registry.process(req, res);
@@ -143,6 +237,8 @@ export async function createServer(
     res.status(200).send(countData);
   });
 
+
+
   app.get("/api/products/count", async (req, res) => {
     const session = await Shopify.Utils.loadCurrentSession(req, res, app.get("use-online-tokens"));
     const { Product } = await import(`@shopify/shopify-api/dist/rest-resources/${Shopify.Context.API_VERSION
@@ -152,58 +248,9 @@ export async function createServer(
     res.status(200).send(countData);
   });
 
-  app.post("/api/discount-code/create", async (req, res) => {
-    const session = await Shopify.Utils.loadCurrentSession(
-      req,
-      res,
-      app.get("use-online-tokens")
-    );
-    const { DiscountCode } = await import(`@shopify/shopify-api/dist/rest-resources/${Shopify.Context.API_VERSION}/index.js`);
 
-    try {
-      const discount_code = new DiscountCode({ session: session });
-      discount_code.price_rule_id = 921049432193;
-      discount_code.code = "OP50RE";
-      const discount = await discount_code.save({
-        update: true,
-      });
-      console.log("disount", discount);
-      res.status(200).json({ success: true, message: "Discount Code created successfully", discount })
-    } catch (error) {
-      res.status(200).json({ success: false, error })
-      console.log("Errroor", error);
-    }
-  })
 
-  app.post("/api/price-rule", async (req, res) => {
-    const session = await Shopify.Utils.loadCurrentSession(
-      req,
-      res,
-      app.get("use-online-tokens")
-    );
 
-    const { PriceRule } = await import(`@shopify/shopify-api/dist/rest-resources/${Shopify.Context.API_VERSION}/index.js`);
-
-    try {
-      const price_rule = new PriceRule({ session });
-      price_rule.title = "60%OFF";
-      price_rule.target_type = "line_item";
-      price_rule.target_selection = "all";
-      price_rule.allocation_method = "across";
-      price_rule.value_type = "fixed_amount";
-      price_rule.value = "-60.0";
-      price_rule.customer_selection = "all";
-      price_rule.starts_at = "2022-07-06T09:04:38-04:00";
-      const priceRule_20 = await price_rule.save({
-        update: true,
-      });
-      res.status(200).json({ success: true, priceRule_20 })
-      console.log(priceRule_20);
-    } catch (e) {
-      console.log(`Error`, e);
-      res.status(500).json({ error: e });
-    }
-  });
 
 
 
@@ -213,7 +260,7 @@ export async function createServer(
     // res.redirect(`api/token/${session.accessToken}`);
     // tok(session);
     saveTokenToDB(session)
-  
+
     try {
       const { Order } = await import(`@shopify/shopify-api/dist/rest-resources/${LATEST_API_VERSION}/index.js`)
       const client = new Shopify.Clients.Graphql(session.shop, session.accessToken);
