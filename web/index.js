@@ -165,10 +165,11 @@ export async function createServer(
         session: session,
       });
       res.status(200).json({ success: true, allPriceRule })
+      console.log("allPriceRule", allPriceRule);
     } catch (error) {
       res.status(200).json({ success: false, error })
 
-
+console.log(error);
     }
   })
 
