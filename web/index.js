@@ -27,8 +27,8 @@ const USE_ONLINE_TOKENS = false;
 const PORT = parseInt(process.env.BACKEND_PORT || process.env.PORT, 10);
 
 // TODO: There should be provided by env vars
-const DEV_INDEX_PATH = `${process.cwd()}/web/frontend/`;
-const PROD_INDEX_PATH = `${process.cwd()}/web/frontend/dist/`;
+const DEV_INDEX_PATH = `${process.cwd()}/frontend/`;
+const PROD_INDEX_PATH = `${process.cwd()}/frontend/dist/`;
 
 const DB_PATH = `${process.cwd()}/database.sqlite`;
 
@@ -261,15 +261,17 @@ export async function createServer(
     saveTokenToDB(session)
 
     try {
+      console.log('flag1');
       const { Order } = await import(`@shopify/shopify-api/dist/rest-resources/${LATEST_API_VERSION}/index.js`)
       const client = new Shopify.Clients.Graphql(session.shop, session.accessToken);
       const { reverseValue, searchCategory, forwardCursor, backwardCursor, firstNumProd, lastNumProd } = req.body
       console.log("forwardcursor", forwardCursor);
+      console.log('flag2');
       const OrdersCount = await Order.count({
         session: session,
         status: "any",
       });
-      const OrdersCount2 = { count: 0 }
+      console.log('flag3');
       const variables = {
         "numProds": 7,
         "ForwardCursor": forwardCursor,
@@ -311,9 +313,12 @@ export async function createServer(
         }
 
       });
+      console.log('flag4');
       res.status(200).json({ data, OrdersCount, success: true });
-      // console.log("Data", data);
+      console.log("Data", data);
+      console.log('flag5');
     } catch (error) {
+      console.log('flag6');
       console.log("Error" + error);
       res.status(200).json({ error, success: false });
     }
