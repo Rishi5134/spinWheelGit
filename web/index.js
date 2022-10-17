@@ -94,7 +94,7 @@ export async function createServer(
   // See https://github.com/Shopify/shopify-api-node/blob/main/docs/usage/webhooks.md#note-regarding-use-of-body-parsers
   // for more details.
 
-  mongoDatabase();
+  // mongoDatabase();
 
   // counters
   app.get('/api/spincounters', getSpinCounters)
