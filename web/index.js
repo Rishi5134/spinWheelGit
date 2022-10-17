@@ -22,6 +22,7 @@ import { createEmails, EmailsListUpdate, findEmail, getEmailsList } from "./Mong
 import { getAccessToken, saveTokenToDB } from "./MongoDatabase/Controllers/tokenController.js";
 import tokenSchema from "./MongoDatabase/Schema/tokenSchema.js";
 
+
 const USE_ONLINE_TOKENS = false;
 
 const PORT = parseInt(process.env.BACKEND_PORT || process.env.PORT, 10);
@@ -81,6 +82,7 @@ export async function createServer(
   app.set("use-online-tokens", USE_ONLINE_TOKENS);
   app.use(cookieParser(Shopify.Context.API_SECRET_KEY));
   app.use(express.json())
+  app.use(cors());
   app.use(bodyParser.urlencoded({ extended: true }));
   // app.use(cors)
   app.use(express.urlencoded({ extended: false }));
