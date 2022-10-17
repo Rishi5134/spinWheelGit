@@ -151,14 +151,7 @@ export async function createServer(
   });
 
   app.get('/api/allpricerules', async (req, res) => {
-    const config = {
-      headers: {
-        "ngrok-skip-browser-warning": "false"
-      }
-    }
-    const getAccessToken = await axios.get(`https://spinwheelapp.herokuapp.com/api/token`, config)
-    const token = getAccessToken.data.getToken
-console.log("token", token);
+
     const session = await Shopify.Utils.loadCurrentSession(
       req,
       res,
@@ -169,12 +162,13 @@ console.log("token", token);
 
     try {
       const allPriceRule = await PriceRule.all({
-        session: token,
+        session: session,
       });
       res.status(200).json({ success: true, allPriceRule })
       console.log("allPriceRule", allPriceRule);
     } catch (error) {
       res.status(200).json({ success: false, error })
+      console.log(error);
 
 console.log(error);
     }
