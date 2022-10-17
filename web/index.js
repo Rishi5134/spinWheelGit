@@ -158,7 +158,7 @@ export async function createServer(
     }
     const getAccessToken = await axios.get(`https://spinwheelapp.herokuapp.com/api/token`, config)
     const token = getAccessToken.data.getToken
-
+console.log("token", token);
     const session = await Shopify.Utils.loadCurrentSession(
       req,
       res,
