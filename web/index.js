@@ -24,7 +24,6 @@ import tokenSchema from "./MongoDatabase/Schema/tokenSchema.js";
 
 const USE_ONLINE_TOKENS = false;
 
-
 const PORT = parseInt(process.env.BACKEND_PORT || process.env.PORT, 10);
 
 // TODO: There should be provided by env vars
