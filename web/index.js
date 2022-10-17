@@ -28,8 +28,8 @@ const USE_ONLINE_TOKENS = false;
 const PORT = parseInt(process.env.BACKEND_PORT || process.env.PORT, 10);
 
 // TODO: There should be provided by env vars
-const DEV_INDEX_PATH = `${process.cwd()}/frontend/`;
-const PROD_INDEX_PATH = `${process.cwd()}/frontend/dist/`;
+const DEV_INDEX_PATH = `${process.cwd()}/web/frontend/`;
+const PROD_INDEX_PATH = `${process.cwd()}/web/frontend/dist/`;
 
 const DB_PATH = `${process.cwd()}/database.sqlite`;
 
@@ -116,7 +116,7 @@ export async function createServer(
         "ngrok-skip-browser-warning": "false"
       }
     }
-    const getAccessToken = await axios.get(`https://8e76-2405-201-200c-69d7-e1fe-539b-d3c2-c13f.in.ngrok.io/api/token`, config)
+    const getAccessToken = await axios.get(`https://spinwheelapp.herokuapp.com/api/token`, config)
     const token = getAccessToken.data.getToken
     // console.log("token: " + token);
     const session = await Shopify.Utils.loadCurrentSession(
@@ -167,7 +167,7 @@ export async function createServer(
     } catch (error) {
       res.status(200).json({ success: false, error })
 
-      
+
     }
   })
 
@@ -178,7 +178,7 @@ export async function createServer(
         "ngrok-skip-browser-warning": "false"
       }
     }
-    const getAccessToken = await axios.get(`https://8e76-2405-201-200c-69d7-e1fe-539b-d3c2-c13f.in.ngrok.io/api/token`, config)
+    const getAccessToken = await axios.get(`https://spinwheelapp.herokuapp.com/api/token`, config)
     const token = getAccessToken.data.getToken
 
     const session = await Shopify.Utils.loadCurrentSession(
