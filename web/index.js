@@ -272,7 +272,7 @@ console.log(error);
 
     try {
       console.log('flag1');
-      const { Order } = await import(`@shopify/shopify-api/dist/rest-resources/${LATEST_API_VERSION}/index.js`)
+      const { Order } = await import(`@shopify/shopify-api/dist/rest-resources/${Shopify.Context.API_VERSION}/index.js`)
       const client = new Shopify.Clients.Graphql(session.shop, session.accessToken);
       const { reverseValue, searchCategory, forwardCursor, backwardCursor, firstNumProd, lastNumProd } = req.body
       console.log("forwardcursor", forwardCursor);
