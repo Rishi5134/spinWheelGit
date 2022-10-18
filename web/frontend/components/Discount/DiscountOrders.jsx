@@ -10,6 +10,9 @@ import Error from "../Error/Error";
 import NoOrdersFound from "../Orders/NoOrdersFound";
 
 const DiscountOrders = () => {
+
+    var newRow =[];
+
     const app = useAppBridge();
     const [orders, setOrders] = useState([]);
     const [lineItems, setLineItems] = useState([]);
@@ -28,6 +31,7 @@ const DiscountOrders = () => {
     const [pageNumber, setpageNumber] = useState(1);
     const [errorOccurred, seterrorOccurred] = useState(false);
     const [noOrders, setnoOrders] = useState(false);
+    const [discountCodes, setdiscountCodes] = useState([]);
 
 
 
@@ -84,7 +88,11 @@ const DiscountOrders = () => {
     const calculatedRows = orders.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
     console.log("calculatedRows:", calculatedRows);
 
-    const rows2 = calculatedRows.map((item) => ([
+
+    // calculatedRows.map((item) => item.node.discountCode === null ? <p>Null</p> :newRow.push(item.node) && console.log("new row:-->", newRow))
+
+    const rows2 = calculatedRows.map((item) => (
+        [
 
         [
             item.node.name,
@@ -104,24 +112,7 @@ const DiscountOrders = () => {
     const ProductID = {
         id: 3937586544769
     }
-    const getSingleOrder = async (SingleProdID) => {
-        const id = SingleProdID.split('/').splice(-1)
-        const token = await getSessionToken(app);
-        console.log("token:-", token);
-        const config = {
-            headers: {
-                Authorization: "Bearer " + token,
-            }
-        }
-        body: ProductID
-        try {
-            const { data } = await axios.get(`/api/order/${id}`, config);
-            console.log("Single Order orders", data)
-        } catch (error) {
-            console.log("Single Order Error", error);
-        }
-
-    }
+console.log("newRow:", newRow);
 
     const getAllOrders = async (queryFilters) => {
         setpageLoading(true)
@@ -154,6 +145,19 @@ const DiscountOrders = () => {
         console.log("Count", data.OrdersCount.count);
         setpageLoading(false)
     }
+
+
+    const allDiscountCodes = async () => {
+        const config = {
+            headers: {
+                "Content-Type": "application/json"
+            },
+        }
+        const { data } = await axios.get('/api/discountcodes', config);
+        console.log("DoscountCodes:-->",data.discountCodes[0].discountCode );
+        setdiscountCodes(data.discountCodes[0].discountCode)
+    }
+
     console.log("Count Orders", count);
     console.log("forwardCursor", forwardCursor);
     console.log("backwardCursor", backwardCursor);
@@ -161,6 +165,7 @@ const DiscountOrders = () => {
         reverseValue, searchCategory, forwardCursor, backwardCursor, nextPage, prevPage, firstNumProd, lastNumProd
     }
     useEffect(() => {
+        allDiscountCodes();
         getAllOrders(queryFilters)
         // getSingleOrder()
     }, [reverseValue, searchCategory, forwardCursor, backwardCursor, nextPage, prevPage, firstNumProd, lastNumProd])

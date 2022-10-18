@@ -13,7 +13,7 @@ import redirectToAuth from "./helpers/redirect-to-auth.js";
 import { BillingInterval } from "./helpers/ensure-billing.js";
 import { AppInstallations } from "./app_installations.js";
 import axios from 'axios'
-import { createSpinCounters, getSpinCounters, singleSpinCounter, updateSpinCounters } from "./MongoDatabase/Controllers/SpinWheelController.js";
+import {  createSpinCountersAndDiscountCode,  getAllDiscountCodes,  getSpinCountersAndDiscountCode, singleSpinCounter,  updateDiscountCode,  updateSpinCountersAndDiscountCode } from "./MongoDatabase/Controllers/SpinWheelController.js";
 import spinWheelSchema from "./MongoDatabase/Schema/spinWheelSchema.js";
 const SpinWheel = import('./MongoDatabase/Schema/spinWheelSchema.js');
 import bodyParser from "body-parser";
@@ -28,8 +28,8 @@ const USE_ONLINE_TOKENS = false;
 const PORT = parseInt(process.env.BACKEND_PORT || process.env.PORT, 10);
 
 // TODO: There should be provided by env vars
-const DEV_INDEX_PATH = `${process.cwd()}/web/frontend/`;
-const PROD_INDEX_PATH = `${process.cwd()}/web/frontend/dist/`;
+const DEV_INDEX_PATH = `${process.cwd()}/frontend/`;
+const PROD_INDEX_PATH = `${process.cwd()}/frontend/dist/`;
 
 const DB_PATH = `${process.cwd()}/database.sqlite`;
 
@@ -98,9 +98,9 @@ export async function createServer(
   mongoDatabase();
 
   // counters
-  app.get('/api/spincounters', getSpinCounters)
-  app.post('/api/spincounters/create', createSpinCounters)
-  app.put('/api/spincounters/update/:id', updateSpinCounters)
+  app.get('/api/spincounters', getSpinCountersAndDiscountCode)
+  app.post('/api/spincounters/create', createSpinCountersAndDiscountCode)
+  app.put('/api/spincounters/update/:id', updateSpinCountersAndDiscountCode)
   app.get('/api/spincounter/:id', singleSpinCounter)
 
   // spin Emails 
@@ -110,6 +110,10 @@ export async function createServer(
   app.get('/api/spinemail/one', findEmail);
   app.get('/api/token', getAccessToken);
 
+  // discountCodes
+  app.put('/api/update/discount/:id', updateDiscountCode);
+  app.get('/api/discountcodes', getAllDiscountCodes);
+
   app.post("/api/price-rule", async (req, res) => {
 
     const config = {
@@ -117,7 +121,7 @@ export async function createServer(
         "ngrok-skip-browser-warning": "false"
       }
     }
-    const getAccessToken = await axios.get(`https://spinwheelapp.herokuapp.com/api/token`, config)
+    const getAccessToken = await axios.get(`https://078a-2405-201-200c-69d7-39be-500b-d7ce-d714.in.ngrok.io/api/token`, config)
     const token = getAccessToken.data.getToken
     // console.log("token: " + token);
     const session = await Shopify.Utils.loadCurrentSession(
@@ -156,7 +160,7 @@ export async function createServer(
         "ngrok-skip-browser-warning": "false"
       }
     }
-    const getAccessToken = await axios.get(`https://spinwheelapp.herokuapp.com/api/token`, config)
+    const getAccessToken = await axios.get(`https://078a-2405-201-200c-69d7-39be-500b-d7ce-d714.in.ngrok.io/api/token`, config)
     const token = getAccessToken.data.getToken
     const session = await Shopify.Utils.loadCurrentSession(
       req,
@@ -187,7 +191,7 @@ console.log(error);
         "ngrok-skip-browser-warning": "false"
       }
     }
-    const getAccessToken = await axios.get(`https://spinwheelapp.herokuapp.com/api/token`, config)
+    const getAccessToken = await axios.get(`https://078a-2405-201-200c-69d7-39be-500b-d7ce-d714.in.ngrok.io/api/token`, config)
     const token = getAccessToken.data.getToken
 
     const session = await Shopify.Utils.loadCurrentSession(
@@ -269,13 +273,17 @@ console.log(error);
     // res.redirect(`api/token/${session.accessToken}`);
     // tok(session);
     saveTokenToDB(session)
-
+    const discountCodes = await spinWheelSchema.find().select({discountCode:1})
+    // res.status(200).json({ success: true, discountCodes })
+    console.log("discountCodes :-->", discountCodes[0].discountCode);
+const discountCodeQuery = discountCodes[0].discountCode.map((i) => "discount_code:" + i)
+console.log("discountCodeQuery :-->", JSON.stringify(discountCodeQuery).split(","));
     try {
       console.log('flag1');
       const { Order } = await import(`@shopify/shopify-api/dist/rest-resources/${Shopify.Context.API_VERSION}/index.js`)
       const client = new Shopify.Clients.Graphql(session.shop, session.accessToken);
       const { reverseValue, searchCategory, forwardCursor, backwardCursor, firstNumProd, lastNumProd } = req.body
-      console.log("forwardcursor", forwardCursor);
+     
       console.log('flag2');
       const OrdersCount = await Order.count({
         session: session,
@@ -288,6 +296,9 @@ console.log(error);
         "ForwardCursor": forwardCursor,
         "BackwardCursor": backwardCursor
       }
+
+
+
       const data = await client.query({
         data: {
           query: `query ($numProds: Int!, $ForwardCursor: String, $BackwardCursor: String) {
@@ -324,10 +335,9 @@ console.log(error);
         }
 
       });
-      console.log("data", data);
       console.log('flag4');
       res.status(200).json({ data, OrdersCount, success: true });
-      console.log("Data", data);
+  
       console.log('flag5');
     } catch (error) {
       console.log('flag6');
