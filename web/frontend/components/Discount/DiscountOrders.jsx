@@ -130,7 +130,6 @@ const DiscountOrders = () => {
         if (data.OrdersCount.count === 0) {
             setpageLoading(false)
             setnoOrders(true)
-        
         }
         setForwardCursorString(data.data.body.data.orders.pageInfo.endCursor)
         setBackwardCursorString(data.data.body.data.orders.pageInfo.startCursor)
