@@ -28,8 +28,8 @@ const USE_ONLINE_TOKENS = false;
 const PORT = parseInt(process.env.BACKEND_PORT || process.env.PORT, 10);
 
 // TODO: There should be provided by env vars
-const DEV_INDEX_PATH = `${process.cwd()}/frontend/`;
-const PROD_INDEX_PATH = `${process.cwd()}/frontend/dist/`;
+const DEV_INDEX_PATH = `${process.cwd()}/web/frontend/`;
+const PROD_INDEX_PATH = `${process.cwd()}/web/frontend/dist/`;
 
 const DB_PATH = `${process.cwd()}/database.sqlite`;
 
@@ -111,7 +111,7 @@ export async function createServer(
   app.get('/api/spinemail/one', findEmail);
   app.get('/api/token', getAccessToken);
 
-  
+
   // discountCodes
   app.put('/api/update/discount/:id', updateDiscountCode);
   app.get('/api/discountcodes', getAllDiscountCodes);
