@@ -11,11 +11,9 @@ import NoOrdersFound from "../Orders/NoOrdersFound";
 
 const DiscountOrders = () => {
 
-    var newRow =[];
-
     const app = useAppBridge();
+
     const [orders, setOrders] = useState([]);
-    const [lineItems, setLineItems] = useState([]);
     const [searchCategory, setSearchCategory] = useState(null)
     const [reverseValue, setReverseValue] = useState(false)
     const [forwardCursor, setForwardCursor] = useState(null);
@@ -31,7 +29,6 @@ const DiscountOrders = () => {
     const [pageNumber, setpageNumber] = useState(1);
     const [errorOccurred, seterrorOccurred] = useState(false);
     const [noOrders, setnoOrders] = useState(false);
-    const [discountCodes, setdiscountCodes] = useState([]);
 
 
 
@@ -89,32 +86,30 @@ const DiscountOrders = () => {
     console.log("calculatedRows:", calculatedRows);
 
 
-    // calculatedRows.map((item) => item.node.discountCode === null ? <p>Null</p> :newRow.push(item.node) && console.log("new row:-->", newRow))
-
     const rows2 = calculatedRows.map((item) => (
         [
 
-        [
-            item.node.name,
-        ],
-        [
-            item.node.lineItems.nodes.map((i) => (<><h1>{i.title}</h1></>)),
-        ],
-        [
-            item.node.email === null ? <p>Not Provided</p> : item.node.email,
-        ],
-        [
-            item.node.discountCode === null ? <p>Null</p> : item.node.discountCode,
-        ],
+            [
+                item.node.name,
+            ],
+            [
+                item.node.lineItems.nodes.map((i) => (<><h1>{i.title}</h1></>)),
+            ],
+            [
+                item.node.email === null ? <p>Not Provided</p> : item.node.email,
+            ],
+            [
+                item.node.discountCode === null ? <p>Null</p> : item.node.discountCode,
+            
+            
+            ],
 
-    ]));
+        ]));
 
-    const ProductID = {
-        id: 3937586544769
-    }
-console.log("newRow:", newRow);
+    
 
     const getAllOrders = async (queryFilters) => {
+       
         setpageLoading(true)
         const token = await getSessionToken(app);
         console.log("token:-", token);
@@ -127,6 +122,7 @@ console.log("newRow:", newRow);
         }
         const { data } = await axios.post('/api/orders', queryFilters, config);
         console.log("All orders", data)
+
         if (data.success === false) {
             setpageLoading(false)
             seterrorOccurred(true)
@@ -134,6 +130,7 @@ console.log("newRow:", newRow);
         if (data.OrdersCount.count === 0) {
             setpageLoading(false)
             setnoOrders(true)
+        
         }
         setForwardCursorString(data.data.body.data.orders.pageInfo.endCursor)
         setBackwardCursorString(data.data.body.data.orders.pageInfo.startCursor)
@@ -147,16 +144,7 @@ console.log("newRow:", newRow);
     }
 
 
-    const allDiscountCodes = async () => {
-        const config = {
-            headers: {
-                "Content-Type": "application/json"
-            },
-        }
-        const { data } = await axios.get('/api/discountcodes', config);
-        console.log("DoscountCodes:-->",data.discountCodes[0].discountCode );
-        setdiscountCodes(data.discountCodes[0].discountCode)
-    }
+    
 
     console.log("Count Orders", count);
     console.log("forwardCursor", forwardCursor);
@@ -165,8 +153,8 @@ console.log("newRow:", newRow);
         reverseValue, searchCategory, forwardCursor, backwardCursor, nextPage, prevPage, firstNumProd, lastNumProd
     }
     useEffect(() => {
-        allDiscountCodes();
-        getAllOrders(queryFilters)
+        getAllOrders(queryFilters);
+
         // getSingleOrder()
     }, [reverseValue, searchCategory, forwardCursor, backwardCursor, nextPage, prevPage, firstNumProd, lastNumProd])
     return (
@@ -185,7 +173,7 @@ console.log("newRow:", newRow);
 
                 {pageLoading === true ? <Loading /> : (<>
                     {errorOccurred === true ? <Error /> : (<>
-
+                       
                         <DataTable columnContentTypes={
                             [
                                 "text",
@@ -204,9 +192,7 @@ console.log("newRow:", newRow);
                                 ]
                             }
                             rows={rows2}
-                            footerContent={
-                                `Showing ${pageNumber} of ${totalPages} results`
-                            } />
+                            />
 
                     </>)}
                 </>)}
