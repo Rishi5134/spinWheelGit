@@ -102,6 +102,7 @@ export async function createServer(
   app.post('/api/spincounters/create', createSpinCountersAndDiscountCode)
   app.put('/api/spincounters/update/:id', updateSpinCountersAndDiscountCode)
   app.get('/api/spincounter/:id', singleSpinCounter)
+  
 
   // spin Emails 
   app.post('/api/spinemail/create', createEmails);
