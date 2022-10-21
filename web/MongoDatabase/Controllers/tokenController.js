@@ -1,6 +1,7 @@
 import { catchErrors } from "../MiddleWare/catchErrors.js";
 import tokenSchema from '../Schema/tokenSchema.js'
 
+//fetches session token from mongodb
 export const getAccessToken = async (req, res) => {
   try {
     const getToken = await tokenSchema.findOne();
@@ -11,7 +12,7 @@ export const getAccessToken = async (req, res) => {
   }
 }
 
-
+//saves and updates session token to mongodb
 export const saveTokenToDB = async (session) => {
   console.log("saving token to db", session);
   const getToken = await tokenSchema.findOne();

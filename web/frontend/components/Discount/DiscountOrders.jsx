@@ -1,6 +1,6 @@
 import { useAppBridge } from "@shopify/app-bridge-react";
 import { getSessionToken } from "@shopify/app-bridge-utils"
-import { Button, DataTable, Pagination } from "@shopify/polaris";
+import { Badge, Button, Card, DataTable, MediaCard, Pagination, Tag } from "@shopify/polaris";
 import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
 import { EditMajor, DeleteMajor } from '@shopify/polaris-icons';
@@ -8,6 +8,10 @@ import '../../Styles/DiscountOrders.css';
 import Loading from "../Loader/Loading";
 import Error from "../Error/Error";
 import NoOrdersFound from "../Orders/NoOrdersFound";
+import {
+    DiscountsMajor
+} from '@shopify/polaris-icons';
+
 
 const DiscountOrders = () => {
 
@@ -100,16 +104,16 @@ const DiscountOrders = () => {
             ],
             [
                 item.node.discountCode === null ? <p>Null</p> : item.node.discountCode,
-            
-            
+
+
             ],
 
         ]));
 
-    
+
 
     const getAllOrders = async (queryFilters) => {
-       
+
         setpageLoading(true)
         const token = await getSessionToken(app);
         console.log("token:-", token);
@@ -143,7 +147,7 @@ const DiscountOrders = () => {
     }
 
 
-    
+
 
     console.log("Count Orders", count);
     console.log("forwardCursor", forwardCursor);
@@ -158,6 +162,9 @@ const DiscountOrders = () => {
     }, [reverseValue, searchCategory, forwardCursor, backwardCursor, nextPage, prevPage, firstNumProd, lastNumProd])
     return (
         <>
+
+
+
             {
                 nextPage !== true ? <style>{cssNextEnable}</style> : <style>{cssNextDisable}</style>
             }
@@ -172,8 +179,8 @@ const DiscountOrders = () => {
 
                 {pageLoading === true ? <Loading /> : (<>
                     {errorOccurred === true ? <Error /> : (<>
-                       
-                        <DataTable columnContentTypes={
+
+                        {/* <DataTable columnContentTypes={
                             [
                                 "text",
                                 "text",
@@ -191,7 +198,23 @@ const DiscountOrders = () => {
                                 ]
                             }
                             rows={rows2}
-                            />
+                            /> */}
+                        <div className="mediaCard">
+                            {calculatedRows.map((item) => (
+                                <div className="mainMediaBlock">
+
+                                    <Card title={item.node.name} >
+                                        <div className="mediaData" >
+
+                                            <p className="email">{item.node.email === null ? <p>Not Provided</p> : item.node.email}</p>
+                                            <p className="totalPrice">{item.node.currencyCode && item.node.currencyCode} {item.node.totalPrice && item.node.totalPrice}</p>
+                                            <div className="badges">{item.node.lineItems.nodes.map((i) => (<div className="badgeData"><Badge className="badge">{i.title}</Badge></div>))}</div>
+                                            <>{item.node.discountCode === null ? <p>Null</p> : <Tag><DiscountsMajor />{item.node.discountCode}</Tag>}</>
+                                        </div>
+                                    </Card>
+                                </div>
+                            ))}
+                        </div>
 
                     </>)}
                 </>)}

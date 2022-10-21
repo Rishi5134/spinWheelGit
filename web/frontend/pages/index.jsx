@@ -15,12 +15,17 @@ import { TitleBar } from "@shopify/app-bridge-react";
 // import { ProductsCard } from "../components";
 // import DiscountCodes from "../components/Discount/DiscountCodes";
 import DiscountOrders from "../components/Discount/DiscountOrders";
+import Status from "../components/Discount/Status";
+import Counters from "../components/Discount/Counters";
 
 export default function HomePage() {
   return (
     <Page fullWidth>
       <Layout>
         <Layout.Section>
+        <Status/>
+        <Counters/>
+        
           <Card sectioned>
           <DiscountOrders />
           </Card>

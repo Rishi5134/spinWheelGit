@@ -21,7 +21,8 @@ import cors from "cors";
 import { createEmails, EmailsListUpdate, findEmail, getEmailsList } from "./MongoDatabase/Controllers/SpinWheelEmailsController.js";
 import { getAccessToken, saveTokenToDB } from "./MongoDatabase/Controllers/tokenController.js";
 import tokenSchema from "./MongoDatabase/Schema/tokenSchema.js";
-
+import { createDiscountCode, getAllPriceRules, setPriceRule } from "./Controllers/discountController.js";
+import { getDiscountOrders } from "./Controllers/ordersController.js";
 
 const USE_ONLINE_TOKENS = false;
 
@@ -85,7 +86,7 @@ export async function createServer(
   app.use(express.json())
   app.use(cors());
   app.use(bodyParser.urlencoded({ extended: true }));
-  // app.use(cors)
+
   app.use(express.urlencoded({ extended: false }));
   applyAuthMiddleware(app, {
     billing: billingSettings,
@@ -98,116 +99,55 @@ export async function createServer(
 
   mongoDatabase();
 
-  // counters
+  // spin counter routes
   app.get('/api/spincounters', getSpinCountersAndDiscountCode)
   app.post('/api/spincounters/create', createSpinCountersAndDiscountCode)
   app.put('/api/spincounters/update/:id', updateSpinCountersAndDiscountCode)
   app.get('/api/spincounter/:id', singleSpinCounter)
 
 
-  // spin Emails 
+  // spin email routes
   app.post('/api/spinemail/create', createEmails);
   app.put('/api/spinemail/update/:id', EmailsListUpdate);
   app.get('/api/spinemails', getEmailsList);
   app.get('/api/spinemail/one', findEmail);
+
+  //accessToken routes
   app.get('/api/token', getAccessToken);
 
 
-  // discountCodes
+  // discount routes
   app.put('/api/update/discount/:id', updateDiscountCode);
   app.get('/api/discountcodes', getAllDiscountCodes);
-
   app.post("/api/price-rule", async (req, res) => {
 
-    var getToken = await tokenSchema.findOne();
-    const session = await Shopify.Utils.loadCurrentSession(
-      req,
-      res,
-      app.get("use-online-tokens")
-      );
-  
+    const session = await Shopify.Utils.loadCurrentSession(req, res, app.get("use-online-tokens"));
+    const { PriceRule } = await import(`@shopify/shopify-api/dist/rest-resources/${Shopify.Context.API_VERSION
+      }/index.js`);
+    setPriceRule(req, res, session, PriceRule);
 
-    const { PriceRule } = await import(`@shopify/shopify-api/dist/rest-resources/${Shopify.Context.API_VERSION}/index.js`);
-
-    try {
-      const price_rule = new PriceRule({ session: getToken });
-      const { title, target_type, target_selection, allocation_method, value_type, value, customer_selection, starts_at } = req.body
-      price_rule.title = title;
-      price_rule.target_type = target_type;
-      price_rule.target_selection = target_selection;
-      price_rule.allocation_method = allocation_method;
-      price_rule.value_type = value_type;
-      price_rule.value = value;
-      price_rule.customer_selection = customer_selection;
-      price_rule.starts_at = starts_at;
-      const priceRule = await price_rule.save({
-        update: true,
-      });
-      res.status(200).json({ success: true, priceRule })
-      console.log("priceRule", priceRule);
-    } catch (e) {
-      console.log(`Error`, e);
-      res.status(500).json({ error: e });
-    }
   });
-
   app.get('/api/allpricerules', async (req, res) => {
-
-
-      var getToken = await tokenSchema.findOne();
-    
     const session = await Shopify.Utils.loadCurrentSession(
       req,
       res,
       app.get("use-online-tokens")
     );
-
-// console.log("sessiondsf", session);
-
     const { PriceRule } = await import(`@shopify/shopify-api/dist/rest-resources/${Shopify.Context.API_VERSION}/index.js`);
-
-    try {
-      const allPriceRule = await PriceRule.all({
-        session: getToken,
-      });
-      res.status(200).json({ success: true, allPriceRule })
-      // console.log("allPriceRule", allPriceRule);
-    } catch (error) {
-      res.status(200).json({ success: false, error })
-      console.log(error);
-
-      console.log(error);
-    }
+    getAllPriceRules(req, res, session, PriceRule)
   })
-
   app.post("/api/discount-code/create", async (req, res) => {
-
-    var getToken = await tokenSchema.findOne();
-
-
     const session = await Shopify.Utils.loadCurrentSession(
       req,
       res,
       app.get("use-online-tokens")
     );
-
 
     const { DiscountCode } = await import(`@shopify/shopify-api/dist/rest-resources/${Shopify.Context.API_VERSION}/index.js`);
-    const { code, priceRuleID } = req.body
-    try {
-      const discount_code = new DiscountCode({ session: getToken });
-      discount_code.price_rule_id = priceRuleID;
-      discount_code.code = code;
-      const discount = await discount_code.save({
-        update: true,
-      });
-      console.log("discount", discount);
-      res.status(200).json({ success: true, message: "Discount Code created successfully", discount })
-    } catch (error) {
-      res.status(200).json({ success: false, error })
-      console.log("Errroor", error);
-    }
+    createDiscountCode(req, res, session, DiscountCode)
   })
+
+  //webhooks
   app.post("/api/webhooks", async (req, res) => {
     try {
       await Shopify.Webhooks.Registry.process(req, res);
@@ -244,114 +184,14 @@ export async function createServer(
     res.status(200).send(countData);
   });
 
-
-
-  app.get("/api/products/count", async (req, res) => {
-    const session = await Shopify.Utils.loadCurrentSession(req, res, app.get("use-online-tokens"));
-    const { Product } = await import(`@shopify/shopify-api/dist/rest-resources/${Shopify.Context.API_VERSION
-      }/index.js`);
-
-    const countData = await Product.count({ session });
-    res.status(200).send(countData);
-  });
-
-
-
-
-
-
-
+  //order routes
   app.post('/api/orders', async (req, res) => {
     const session = await Shopify.Utils.loadCurrentSession(req, res, app.get("use-online-tokens"));
-    console.log("Session :-->", session);
-    // res.redirect(`api/token/${session.accessToken}`);
-    // tok(session);
-    saveTokenToDB(session)
-    var finalQuery = []
-    const discountCodes = await spinWheelSchema.find().select({ discountCode: 1 })
-
-    console.log("discountCodes :-->", discountCodes[0].discountCode);
-    const lastElement = discountCodes[0].discountCode.length - 1
-    const lastElementQuery = "discount_code:" + discountCodes[0].discountCode[discountCodes[0].discountCode.length - 1]
-    for (let index = 0; index < lastElement; index++) {
-      const element = discountCodes[0].discountCode[index];
-
-      const result = finalQuery.push("discount_code:" + element + " OR ")
-      console.log("element:", result);
-
-      console.log("finalQuery :-->", finalQuery);
-    }
-    finalQuery.push(lastElementQuery);
-    // const discountCodeQuery = discountCodes[0].discountCode
-
-    // console.log("discountCodeQuery :-->",discountCodeQuery)
-    try {
-
-      console.log('flag1');
-      const { Order } = await import(`@shopify/shopify-api/dist/rest-resources/${Shopify.Context.API_VERSION}/index.js`)
-      const client = new Shopify.Clients.Graphql(session.shop, session.accessToken);
-      const { reverseValue, searchCategory, forwardCursor, backwardCursor, firstNumProd, lastNumProd } = req.body
-      const resultQuery = finalQuery.toString().replaceAll(',', '')
-      console.log('flag2', resultQuery);
-      const OrdersCount = await Order.count({
-        session: session,
-        status: "any",
-      });
-      console.log("ordersCount", OrdersCount);
-      console.log('flag3');
-      const variables = {
-        "numProds": 7,
-        "ForwardCursor": forwardCursor,
-        "BackwardCursor": backwardCursor
-      }
-
-      console.log("finalQuery", finalQuery.toString().replaceAll(',', ''));
-      const data = await client.query({
-        data: {
-          query: `query ($numProds: Int!, $ForwardCursor: String, $BackwardCursor: String) {
-                    orders(reverse:${reverseValue}, first: ${firstNumProd}, after: $ForwardCursor, last: ${lastNumProd}, before: $BackwardCursor, query: "${resultQuery}") {
-                      edges {
-                        cursor
-                        node {
-                          id
-                          totalPrice
-                          name
-                          email
-                          discountCode
-                          lineItems(first: 10) {
-                            nodes {
-                              name
-                              title
-                              variantTitle
-                              id
-                            }
-                          }
-                        }
-                      }
-                      pageInfo {
-                        startCursor
-                        hasNextPage
-                        hasPreviousPage
-                        endCursor
-                      }
-                    }
-                  }
-                  `,
-
-          variables: variables
-        }
-
-      });
-      console.log('flag4');
-      res.status(200).json({ data, OrdersCount, success: true, finalQuery });
-
-      console.log('flag5');
-    } catch (error) {
-      console.log('flag6');
-      console.log("Error" + error);
-      res.status(200).json({ error, success: false });
-    }
+    const { Order } = await import(`@shopify/shopify-api/dist/rest-resources/${Shopify.Context.API_VERSION}/index.js`)
+    const client = new Shopify.Clients.Graphql(session.shop, session.accessToken);
+    getDiscountOrders(req, res, session, Order, client);
   })
+
 
   app.get("/api/products/create", async (req, res) => {
     const session = await Shopify.Utils.loadCurrentSession(

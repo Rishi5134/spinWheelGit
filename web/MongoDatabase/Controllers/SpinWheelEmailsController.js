@@ -1,6 +1,7 @@
 import EmailSchema from "../Schema/spinWheelEmailSchema.js";
 import {catchErrors} from '../MiddleWare/catchErrors.js';
 
+// creates new email doc 
 export const createEmails = catchErrors(async (req, res, next) => {
     try {
 
@@ -13,6 +14,8 @@ export const createEmails = catchErrors(async (req, res, next) => {
     }
 
 })
+
+//updates email array
 export const EmailsListUpdate = catchErrors(async (req, res, next) => {
 
     try {
@@ -28,6 +31,8 @@ export const EmailsListUpdate = catchErrors(async (req, res, next) => {
     }
 
 })
+
+//fetches email array
 export const getEmailsList = catchErrors(async (req, res, next) => {
 
     try {
@@ -41,6 +46,8 @@ export const getEmailsList = catchErrors(async (req, res, next) => {
     }
 
 })
+
+// checks email present or not, before spin
 export const findEmail = catchErrors(async (req, res, next) => {
         try {
                 const email = req.query.email;
