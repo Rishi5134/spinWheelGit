@@ -1,0 +1,273 @@
+* {
+    margin: 0%;
+    padding: 0%;
+    box-sizing: border-box;
+}
+
+text {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 11px;
+    pointer-events: none;
+}
+
+#chart {
+    /* position:absolute; */
+    width: 50vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* margin-top: 10rem; */
+}
+
+#offerText {
+    /* position: absolute; */
+    width: 20vw;
+    height: 100vh;
+    top: 0;
+    left: 650px;
+}
+
+#offerText h1 {
+    font-size: 50px;
+    font-weight: bold;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    position: absolute;
+    padding: 0;
+    margin: 0;
+    top: 50%;
+    -webkit-transform: translate(0, -50%);
+    transform: translate(0, -50%);
+}
+
+body {
+    background-color: orange;
+}
+
+.main {
+    /* display: none; */
+    width: 100vw;
+    height: 100vh;
+    /* margin-top: -10rem; */
+    flex-wrap: wrap;
+
+}
+
+#spin_block {
+    display: none;
+}
+
+.formBlock {
+    height: 100vh;
+    margin: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* margin-top: 10rem; */
+}
+
+.formBlock>form {
+    display: flex;
+    flex-direction: column;
+}
+
+form>input {
+    margin-bottom: 2rem !important;
+}
+
+.slice>text {
+    font-size: 1.5rem;
+}
+
+#spinnerCode {
+    text-align: center !important;
+}
+
+text {
+    color: blue !important;
+}
+
+.positionImage {
+    height: 100vh;
+    width: 100vw;
+}
+
+.spinnerImage:hover {
+    cursor: pointer;
+}
+
+.spinnerImage {
+    float: right;
+    margin: 2rem;
+    object-fit: contain;
+}
+
+.spinnWheel {
+    /* background-color: rgba(0, 255, 255, 0); */
+    background-image: none;
+    /* border-radius: 100%; */
+    /* z-index: 9999; */
+    z-index: 9;
+}
+
+#mainSpinnner {
+    display: flex;
+    flex-direction: column;
+}
+
+#closeSpinDiv,
+.spinCounterDiv {
+    /* height: 2vh; */
+    position: absolute;
+
+    float: right;
+    width: 100vw;
+}
+
+.spinCounterDiv {
+    width: 100%;
+
+}
+
+#closeSpin {
+    float: right;
+    font-size: 36px;
+    height: 2rem;
+    margin-top: 1rem;
+    padding: 1rem;
+}
+
+#spinCounter {
+    text-align: center;
+
+    font-size: 36px;
+    height: 2rem;
+    margin-top: 1rem;
+    padding: 1rem;
+}
+
+#closeSpin:hover {
+    cursor: pointer;
+
+}
+
+.banner--large:not(.banner--adapt) {
+    min-height: 72rem;
+    /* z-index: -1; */
+}
+
+#spin_block {
+    background-color: rgba(0, 255, 255, 0.48);
+    background-image: none;
+
+}
+
+.image_block {
+    right: 0;
+    width: max-content;
+    float: right !important;
+    bottom: 0 !important;
+
+}
+
+.offerDisp {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* .spinText{
+    font-size: 5rem !important;
+} */
+@media screen and (max-width: 1250px) {
+    .offerDisp {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column !important;
+    }
+
+    #offerText {
+        width: 50vw;
+        height: max-content;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #offerText>h1 {
+        margin-top: -15rem;
+    }
+
+
+    .formBlock {
+        height: max-content;
+        margin: auto;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        /* margin-top: -5rem; */
+    }
+}
+
+@media screen and (max-width: 960px) {
+
+    #chart {
+        width: max-content;
+    }
+}
+
+@media screen and (max-width: 800px) {
+    #spin_block {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+    }
+
+    #spinCounter {
+        text-align: center;
+        font-size: 25px;
+        height: 2rem;
+        margin-top: 1rem;
+        padding: 1rem;
+
+    }
+
+
+    #closeSpinDiv,
+    .spinCounterDiv {
+        /* height: 2vh; */
+        position: absolute;
+        float: right;
+        width: 100vw;
+        margin-top: 3rem;
+    }
+
+    #chart {
+        width: 100vw;
+        height: auto;
+        margin-top: 8rem !important;
+    }
+
+    #offerText>h1 {
+        margin-top: 6rem !important;
+    }
+
+    .formBlock>form>label {
+        display: inline-block;
+        font-size: 2rem !important;
+        color: white !important;
+        font-weight: bold !important;
+    }
+
+    .formBlock>form>input {
+        background-color: white !important;
+    }
+
+    .formBlock {
+        margin-top: 7rem !important;
+    }
+}

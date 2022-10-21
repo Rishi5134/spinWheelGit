@@ -29,7 +29,7 @@ const Counters = () => {
 
                     <TextContainer>
                         <div className="counterHeading">
-                            {error && <h1>{error}</h1>}
+                            {error && <p>{error}</p>}
 
                             <h1>Spin Wheel App Counters</h1>
                         </div>
