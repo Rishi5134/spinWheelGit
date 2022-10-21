@@ -43,7 +43,7 @@ export const getDiscountOrders = async(req, res, session, Order, client) => {
       const data = await client.query({
         data: {
           query: `query ($numProds: Int!, $ForwardCursor: String, $BackwardCursor: String) {
-                    orders(reverse:${reverseValue}, first: ${firstNumProd}, after: $ForwardCursor, last: ${lastNumProd}, before: $BackwardCursor, query: "discount_code:GLMIKA OR discount_code:YGNTEO OR discount_code:OP50RE OR discount_code:MNSDRO OR discount_code:UGRDSF OR ${resultQuery}") {
+                    orders(reverse:${reverseValue}, first: ${firstNumProd}, after: $ForwardCursor, last: ${lastNumProd}, before: $BackwardCursor, query: "${resultQuery}") {
                       edges {
                         cursor
                         node {
