@@ -8,13 +8,14 @@ import Loading from "../Loader/Loading";
 const Counters = () => {
 
     const [counterData, setCounterData] = useState([]);
+    const [error, seterror] = useState([]);
     const getCounters = async () => {
         try {
             const { data } = await axios.get('/api/spincounters');
-            console.log("Counters", data.data);
+
             setCounterData(data.data)
         } catch (error) {
-            console.log("error", error);
+            seterror(error.data)
         }
     }
     useEffect(() => {
@@ -28,12 +29,13 @@ const Counters = () => {
 
                     <TextContainer>
                         <div className="counterHeading">
+                            {error && <h1>{error}</h1>}
 
                             <h1>Spin Wheel App Counters</h1>
                         </div>
                         <div className="counterBlocks">
                             {!counterData ? (<><Loading /></>) : counterData.map((i) => (<>
-
+                                <span key={i._id}></span>
                                 <Card sectioned>
                                     <Heading>Opened</Heading>
                                     {i.openedSpinwheel}

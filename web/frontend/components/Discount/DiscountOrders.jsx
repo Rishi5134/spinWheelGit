@@ -34,9 +34,6 @@ const DiscountOrders = () => {
     const [errorOccurred, seterrorOccurred] = useState(false);
     const [noOrders, setnoOrders] = useState(false);
 
-
-
-
     const prevData = () => {
         setBackwardCursor(backwardCursorString)
         setForwardCursor(null)
@@ -81,13 +78,9 @@ const DiscountOrders = () => {
 `
 
     const [currentPage, setCurrentPage] = useState(1);
-    console.log("currentPage: " + currentPage);
     const rowsPerPage = 7
-    console.log("count:", count);
     const totalPages = Math.ceil(count / rowsPerPage)
-    console.log("Total pages: " + totalPages);
     const calculatedRows = orders.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
-    console.log("calculatedRows:", calculatedRows);
 
 
     const rows2 = calculatedRows.map((item) => (
@@ -116,7 +109,7 @@ const DiscountOrders = () => {
 
         setpageLoading(true)
         const token = await getSessionToken(app);
-        console.log("token:-", token);
+        
         const config = {
             headers: {
                 Authorization: "Bearer " + token,
@@ -125,7 +118,7 @@ const DiscountOrders = () => {
             body: JSON.stringify(queryFilters)
         }
         const { data } = await axios.post('/api/orders', queryFilters, config);
-        console.log("All orders", data)
+    
 
         if (data.success === false) {
             setpageLoading(false)
@@ -142,16 +135,10 @@ const DiscountOrders = () => {
         setOrders(data.data.body.data.orders.edges);
         // setCustomerEmail(data.body.data.orders.edges);
         setCount(data.OrdersCount.count)
-        console.log("Count", data.OrdersCount.count);
         setpageLoading(false)
     }
 
 
-
-
-    console.log("Count Orders", count);
-    console.log("forwardCursor", forwardCursor);
-    console.log("backwardCursor", backwardCursor);
     const queryFilters = {
         reverseValue, searchCategory, forwardCursor, backwardCursor, nextPage, prevPage, firstNumProd, lastNumProd
     }
@@ -180,35 +167,16 @@ const DiscountOrders = () => {
                 {pageLoading === true ? <Loading /> : (<>
                     {errorOccurred === true ? <Error /> : (<>
 
-                        {/* <DataTable columnContentTypes={
-                            [
-                                "text",
-                                "text",
-                                "text",
-                                "text"
-                            ]
-                        }
-                            headings={
-                                [
-                                    "Order",
-                                    "Ordered Items",
-                                    "Email",
-                                    "Discount Codes",
-
-                                ]
-                            }
-                            rows={rows2}
-                            /> */}
+                    
                         <div className="mediaCard">
                             {calculatedRows.map((item) => (
-                                <div className="mainMediaBlock">
+                                <div className="mainMediaBlock" key={item.node.id} >
 
                                     <Card title={item.node.name} >
                                         <div className="mediaData" >
-
                                             <p className="email">{item.node.email === null ? <p>Not Provided</p> : item.node.email}</p>
                                             <p className="totalPrice">{item.node.currencyCode && item.node.currencyCode} {item.node.totalPrice && item.node.totalPrice}</p>
-                                            <div className="badges">{item.node.lineItems.nodes.map((i) => (<div className="badgeData"><Badge className="badge">{i.title}</Badge></div>))}</div>
+                                            <div className="badges">{item.node.lineItems.nodes.map((i) => (<div key={i.id} className="badgeData"><Badge className="badge">{i.title}</Badge></div>))}</div>
                                             <>{item.node.discountCode === null ? <p>Null</p> : <Tag><DiscountsMajor />{item.node.discountCode}</Tag>}</>
                                         </div>
                                     </Card>

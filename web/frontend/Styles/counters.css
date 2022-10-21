@@ -22,7 +22,11 @@
     justify-content: space-between;
     flex-wrap: wrap;
 }
-
+.counterBlocks>.Polaris-Card:hover {
+    cursor: pointer;
+    border: 1px solid transparent;
+    box-shadow: 15rem 15px 25px solid black !important;
+}
 .counterBlocks>.Polaris-Card {
 width: 25rem;
  padding: 0rem 2rem;
